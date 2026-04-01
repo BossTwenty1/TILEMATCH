@@ -7,6 +7,20 @@ import { useToast } from '../context/ToastContext';
 import { User, LogOut, Package, Eye } from 'lucide-react';
 import './Account.css';
 
+const Field = React.memo(({ label, name, type = 'text', value, onChange }) => (
+  <div className="input-group">
+    <label>{label}</label>
+    <input 
+      className="input" 
+      type={type} 
+      name={name} 
+      value={value || ''}
+      onChange={onChange} 
+      required 
+    />
+  </div>
+));
+
 export default function Account() {
   const { user, isLoggedIn, login, register, logout } = useAuth();
   const { addToast } = useToast();
@@ -15,10 +29,16 @@ export default function Account() {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
-    email: '', password: '', firstName: '', lastName: '', phone: '',
-    municipality: '', city: '', barangay: '', street: '', postalCode: ''
+    loginEmail: '', loginPassword: '', registerEmail: '', registerPassword: '', userEmail: '', 
+    firstName: '', lastName: '', phone: '', municipality: '', city: '', 
+    barangay: '', street: '', postalCode: '',
   });
   const [error, setError] = useState('');
+
+  const handleChange = React.useCallback((e) => {
+    const { name, value } = e.target;
+    setFormData(p => ({ ...p, [name]: value }));
+  }, []);
 
   useEffect(() => {
     if (isLoggedIn) {
@@ -31,7 +51,7 @@ export default function Account() {
     setError('');
     setLoading(true);
     try {
-      await login(formData.email, formData.password);
+      await login(formData.loginEmail, formData.loginPassword);
       addToast('Welcome back!');
     } catch (err) {
       setError(err.response?.data?.error || 'Login failed');
@@ -55,7 +75,7 @@ export default function Account() {
     setError('');
     setLoading(true);
     try {
-      await authAPI.forgotPassword(formData.email);
+      await authAPI.forgotPassword(formData.loginEmail);
       addToast('Password reset link sent to your email.');
       setMode('login');
     } catch (err) {
@@ -63,13 +83,7 @@ export default function Account() {
     } finally { setLoading(false); }
   };
 
-  const Field = React.memo(({ label, name, type = 'text' }) => (
-    <div className="input-group">
-      <label>{label}</label>
-      <input className="input" type={type} value={formData[name]}
-        onChange={e => setFormData(p => ({...p, [name]: e.target.value}))} required />
-    </div>
-  ));
+  
 
   // Logged in: show profile + orders
   if (isLoggedIn) {
@@ -88,7 +102,7 @@ export default function Account() {
             <div className="card card-body">
               <h3><User size={18} /> Profile</h3>
               <div className="profile-detail"><span>Name</span><strong>{user.firstName} {user.lastName}</strong></div>
-              <div className="profile-detail"><span>Email</span><strong>{user.email}</strong></div>
+              <div className="profile-detail"><span>Email</span><strong>{user.userEmail}</strong></div>
               <div className="profile-detail"><span>Phone</span><strong>{user.phone || '—'}</strong></div>
               <div className="profile-detail"><span>Address</span><strong>
                 {user.address?.street && `${user.address.street}, ${user.address.barangay}, ${user.address.city}, ${user.address.municipality} ${user.address.postalCode}`}
@@ -141,8 +155,8 @@ export default function Account() {
                 <h2>Welcome Back</h2>
                 <p className="text-secondary">Login to your TileMatch account</p>
                 {error && <div className="alert-error">{error}</div>}
-                <Field label="Email" name="email" type="email" />
-                <Field label="Password" name="password" type="password" />
+                <Field label="Email" name="loginEmail" type="email" value={formData.loginEmail} onChange={handleChange}/>
+                <Field label="Password" name="loginPassword" type="password" value={formData.loginPassword} onChange={handleChange}/>
                 <button className="btn btn-primary btn-lg btn-block" type="submit" disabled={loading}>
                   {loading ? 'Logging in...' : 'Login'}
                 </button>
@@ -155,7 +169,7 @@ export default function Account() {
                 <h2>Forgot Password</h2>
                 <p className="text-secondary">Enter your email and we will send you a reset link.</p>
                 {error && <div className="alert-error">{error}</div>}
-                <Field label="Email" name="email" type="email" />
+                <Field label="Email" name="loginEmail" type="email" value={formData.loginEmail} onChange={handleChange}/>
                 <button className="btn btn-primary btn-lg btn-block" type="submit" disabled={loading} style={{ marginTop: 20 }}>
                   {loading ? 'Sending...' : 'Send Reset Link'}
                 </button>
@@ -169,16 +183,16 @@ export default function Account() {
                 <p className="text-secondary">Register for a new TileMatch account</p>
                 {error && <div className="alert-error">{error}</div>}
                 <div className="form-grid">
-                  <Field label="First Name" name="firstName" />
-                  <Field label="Last Name" name="lastName" />
-                  <Field label="Email" name="email" type="email" />
-                  <Field label="Password" name="password" type="password" />
-                  <Field label="Phone" name="phone" type="tel" />
-                  <Field label="Municipality" name="municipality" />
-                  <Field label="City" name="city" />
-                  <Field label="Barangay" name="barangay" />
-                  <Field label="Street + House No." name="street" />
-                  <Field label="Postal Code" name="postalCode" />
+                  <Field label="First Name" name="firstName" value={formData.firstName} onChange={handleChange}/>
+                  <Field label="Last Name" name="lastName" value={formData.lastName} onChange={handleChange}/>
+                  <Field label="Email" name="registerEmail" type="email" value={formData.registerEmail} onChange={handleChange}/>
+                  <Field label="Password" name="registerPassword" type="password" value={formData.registerPassword} onChange={handleChange}/>
+                  <Field label="Phone" name="phone" type="tel" value={formData.phone} onChange={handleChange}/>
+                  <Field label="Municipality" name="municipality" value={formData.municipality} onChange={handleChange}/>
+                  <Field label="City" name="city" value={formData.city} onChange={handleChange}/>
+                  <Field label="Barangay" name="barangay" value={formData.barangay} onChange={handleChange}/>
+                  <Field label="Street + House No." name="street" value={formData.street} onChange={handleChange}/>
+                  <Field label="Postal Code" name="postalCode" value={formData.postalCode} onChange={handleChange}/>
                 </div>
                 <button className="btn btn-primary btn-lg btn-block" type="submit" disabled={loading} style={{marginTop:20}}>
                   {loading ? 'Creating Account...' : 'Register'}
