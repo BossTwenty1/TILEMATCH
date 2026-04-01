@@ -1,0 +1,25 @@
+.checkout-steps { display: flex; align-items: center; justify-content: center; gap: 16px; margin: 28px 0; }
+.step { display: flex; align-items: center; gap: 8px; font-size: 14px; color: var(--text-muted); }
+.step span { width: 28px; height: 28px; border-radius: 50%; background: var(--border); display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 13px; }
+.step.active { color: var(--primary); font-weight: 600; }
+.step.active span { background: var(--primary); color: white; }
+.step-line { width: 60px; height: 2px; background: var(--border); }
+.checkout-layout { display: grid; grid-template-columns: 1fr 360px; gap: 32px; }
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 16px; }
+.form-actions { display: flex; justify-content: space-between; margin-top: 24px; gap: 12px; flex-wrap: wrap; }
+.gcash-section { margin-top: 16px; }
+.gcash-info { display: flex; align-items: center; gap: 16px; padding: 16px; background: #e8f5e9; border-radius: var(--radius-md); margin-bottom: 16px; }
+.gcash-icon { color: #0a7c21; }
+.gcash-info h4 { color: #0a7c21; margin-bottom: 2px; }
+.gcash-info p { font-size: 13px; color: var(--text-secondary); }
+.gcash-details { background: var(--bg); padding: 16px; border-radius: var(--radius-md); border: 1px dashed var(--border); }
+.gcash-row { display: flex; justify-content: space-between; padding: 8px 0; font-size: 14px; }
+.gcash-amount { color: var(--primary); font-size: 18px; }
+.gcash-ref { color: var(--accent); font-size: 16px; letter-spacing: 1px; }
+.gcash-instruction { margin-top: 12px; font-size: 13px; color: var(--text-secondary); text-align: center; font-style: italic; }
+.checkout-item { display: flex; justify-content: space-between; padding: 8px 0; font-size: 14px; border-bottom: 1px solid var(--border-light); }
+.checkout-summary { position: sticky; top: 96px; height: fit-content; }
+@media (max-width: 768px) {
+  .checkout-layout { grid-template-columns: 1fr; }
+  .form-grid { grid-template-columns: 1fr; }
+}

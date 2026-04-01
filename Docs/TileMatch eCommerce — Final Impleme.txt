@@ -1,0 +1,416 @@
+TileMatch eCommerce — Final Implementation Plan
+Single React Artifact | No Build Tools | No localStorage | No External Router
+
+1. Goal
+Build a full, professional eCommerce web app for "TILEMATCH" inside one React artifact. The app covers the complete customer journey and a full admin panel, based on the SRS requirements.
+
+2. Tech Stack
+ToolPurposeNotesReact + HooksUI and all stateuseState, useContext, useReducerContext APIGlobal state (Cart, Auth, Store)In-memory only, no localStoragelucide-reactIconsAlready available in artifactrechartsAdmin chartsAlready available in artifactInline styles + CSS-in-JSStylingNo external CSS filesplacehold.coMock product imagesNo local assets needed
+
+3. Navigation System
+No react-router-dom. Use a single activePage state string in the root App component.
+jsconst [activePage, setActivePage] = useState('home');
+const [selectedProductId, setSelectedProductId] = useState(null);
+const [selectedOrderId, setSelectedOrderId] = useState(null);
+All Page Keys
+KeyViewhomeHomepageshopProduct listing with filtersproductProduct detail (uses selectedProductId)cartCart pagecheckoutCheckout form + GCashconfirmationOrder confirmationtrackingOrder trackingaccountLogin / Register / Profileadmin-dashboardAdmin overviewadmin-productsProduct management (CRUD)admin-inventoryInventory + stock managementadmin-ordersOrder managementadmin-analyticsSales charts + CSV export
+
+4. State Architecture
+Three Context providers wrap the entire app. No data is written to localStorage.
+AuthContext
+js{
+  currentUser: null | userObject,
+  isAdmin: false | true,
+  login(email, password): boolean,
+  logout(): void,
+  register(formData): boolean,
+  users: [...mockUsers]
+}
+CartContext
+js{
+  items: [{ product, qty }],
+  addItem(product, qty): void,
+  removeItem(productId): void,
+  updateQty(productId, qty): void,
+  clearCart(): void,
+  itemCount: number,
+  subtotal: number
+}
+StoreContext
+js{
+  products: [...],
+  orders: [...],
+  addProduct(product): void,
+  updateProduct(id, data): void,
+  deleteProduct(id): void,
+  updateStock(productId, qty): void,
+  placeOrder(orderData): string,       // returns new order ID
+  updateOrderStatus(orderId, status): void
+}
+
+5. Mock Data Schema
+Define one MOCK_DATA object at the very top of the artifact file.
+Products (30 minimum)
+js{
+  id: 'P001',
+  name: 'Marble White Ceramic 30x30',
+  category: 'Ceramic',       // Ceramic | Porcelain | Glass | Natural Stone | Decorative
+  material: 'Ceramic',
+  color: 'White',
+  size: '30x30',             // 20x20 | 30x30 | 40x40 | 60x60 | 30x60
+  roomApplication: 'Floor',  // Floor | Wall | Outdoor | Bathroom | Kitchen
+  price: 450,                // PHP per piece
+  stock: 85,
+  soldCount: 120,
+  image: 'https://placehold.co/400x400/e8e0d5/555555?text=Ceramic+Tile',
+  description: 'Premium white ceramic tile suitable for floors and walls.',
+  isActive: true,
+  createdAt: '2025-01-15'
+}
+Distribute products evenly: 6 per category. Include varied prices (PHP 150 to PHP 2500), sizes, colors, and room applications.
+Orders (15 minimum)
+js{
+  id: 'ORD-2025-0001',
+  customerId: 'C001',
+  customerName: 'Juan dela Cruz',
+  customerEmail: 'juan@email.com',
+  items: [
+    { productId: 'P001', name: 'Marble White Ceramic 30x30', qty: 10, price: 450 }
+  ],
+  shipping: {
+    municipality: 'Naga',
+    city: 'Naga City',
+    barangay: 'Triangulo',
+    street: '123 Magsaysay Ave',
+    postalCode: '4400'
+  },
+  subtotal: 4500,
+  tax: 540,           // 12% VAT
+  shippingFee: 200,
+  total: 5240,
+  paymentMethod: 'GCash',
+  paymentRef: '9876543210123',
+  status: 'Delivered',  // Pending | Processing | Shipped | Delivered
+  createdAt: '2025-01-20',
+  estimatedDelivery: '2025-01-27'
+}
+Spread order dates across 12 months for chart data. Mix all 4 statuses across the 15 orders.
+Users (6 total)
+js// 5 customers
+{
+  id: 'C001',
+  email: 'juan@email.com',
+  password: 'password123',
+  firstName: 'Juan',
+  lastName: 'dela Cruz',
+  phone: '09171234567',
+  role: 'customer',
+  address: {
+    municipality: 'Naga', city: 'Naga City',
+    barangay: 'Triangulo', street: '123 Magsaysay Ave', postalCode: '4400'
+  },
+  createdAt: '2025-01-10'
+}
+
+// 1 admin
+{
+  id: 'A001',
+  email: 'admin@tilematch.com',
+  password: 'admin123',
+  firstName: 'Admin',
+  lastName: 'TileMatch',
+  role: 'admin'
+}
+
+6. Pages — Full Specification
+HomePage
+
+Full-width hero banner. Headline + subtext + "Shop Now" CTA -> shop
+5 category cards with icons or colored tiles -> shop filtered by category
+Featured products section (8 products, highest soldCount)
+Brand story section (short paragraph + image)
+Promotional banner (e.g., "Free Shipping on orders above PHP 2,000")
+Footer with links
+
+ShopPage
+
+Left sidebar filters (collapsible on mobile):
+
+Category checkboxes (5 categories)
+Price range dual slider (PHP 0 to PHP 3000)
+Material checkboxes
+Color swatches
+Size checkboxes
+Room application checkboxes
+Sort dropdown: Price Low-High, Price High-Low, Newest, Best Sellers
+
+
+Search bar at top
+Product grid: 4 columns desktop, 2 tablet, 1 mobile
+Each ProductCard: image, name, category badge, price, stock badge, Add to Cart button
+"No results found" empty state
+Filter uses array .filter() on products from StoreContext — no API calls
+
+ProductDetailPage
+
+Large main image + 3 smaller thumbnail placeholders
+Product name, price (bold), category, material, size, color
+Stock badge: green (In Stock), yellow (Low Stock < 10), red (Out of Stock)
+Description paragraph
+Specifications table: material, size, color, room application, category
+Quantity selector (disabled if out of stock, max = stock qty)
+Add to Cart button -> adds to CartContext, shows toast confirmation
+Disable add if stock = 0
+
+CartPage
+
+List of cart items: image, name, price, qty controls (+/-), remove button
+Auto-recalculate on any qty change
+Price breakdown: subtotal, shipping fee (PHP 200 flat, free if subtotal > PHP 2000), 12% VAT, total
+Empty cart state with "Go Shopping" button
+"Proceed to Checkout" button (requires login, redirect to account if not logged in)
+
+CheckoutPage
+Two-step flow using a step state (1 or 2).
+Step 1 — Shipping Details:
+
+Fields: First Name, Last Name, Email, Phone, Municipality, City, Barangay, Street + House No., Postal Code
+All fields required. Validate before proceeding to Step 2.
+Pre-fill from currentUser address if logged in
+
+Step 2 — Review + Payment:
+
+Order summary: items list, price breakdown
+GCash payment section:
+
+Display GCash number: 0917-TILE-MATCH (mock)
+Display exact amount to pay
+Generate and display 13-digit reference number
+Instruction text: "Send payment via GCash then click Confirm Order"
+
+
+"Confirm Order" button:
+
+Calls StoreContext.placeOrder()
+Decrements stock for each item via updateStock()
+Calls CartContext.clearCart()
+Sets selectedOrderId to new order ID
+Navigates to confirmation
+
+
+
+OrderConfirmationPage
+
+Success icon + "Order Placed!" heading
+Order ID and GCash reference number (prominent)
+Items ordered summary
+Estimated delivery date (order date + 7 days)
+Two buttons: "Track Order" -> tracking | "Continue Shopping" -> shop
+
+OrderTrackingPage
+
+If arrived from confirmation: auto-load the order
+Input field: enter Order ID manually
+On search: find order in StoreContext.orders
+Display status timeline (4 steps with icons, active step highlighted):
+Pending -> Processing -> Shipped -> Delivered
+Order details below timeline: items, shipping address, total, payment ref
+"Not found" state for invalid order ID
+
+AccountPage
+Two modes: authMode state = 'login' | 'register' | 'profile'
+Login form:
+
+Email + Password fields
+"Login" button calls AuthContext.login()
+Show error on wrong credentials
+Toggle to Register
+
+Register form:
+
+First Name, Last Name, Email, Password, Phone
+Address fields: Municipality, City, Barangay, Street + House No., Postal Code
+Validate email format (must contain @), check for duplicate email
+On success: auto-login, go to profile view
+
+Profile view (logged in):
+
+Display name, email, phone, address
+Order history table: Order ID, date, total, status, "View" button
+"View" opens tracking page for that order
+Logout button
+
+
+7. Admin Pages
+Admin pages are only accessible when isAdmin = true. Show "Access Denied" otherwise.
+AdminDashboard
+
+4 stat cards:
+
+Total Revenue (sum of all order totals)
+Total Orders (orders array length)
+Total Customers (users with role = 'customer')
+Low Stock Items (products with stock < 10)
+
+
+Recent Orders table: last 5 orders, columns: Order ID, Customer, Total, Status
+Quick nav buttons to other admin pages
+
+AdminProducts
+
+Products table: Image (small), Name, Category, Price, Stock, Status (Active/Inactive), Actions
+Actions per row: Edit button, Delete button
+"Add Product" button opens a modal form:
+
+Fields: Name, Description, Category, Material, Color, Size, Room Application, Price, Stock, Image URL, Active toggle
+Validate all required fields
+On save: calls StoreContext.addProduct()
+
+
+Edit modal: pre-fills existing product data, calls updateProduct()
+Delete: confirmation prompt, calls deleteProduct()
+Search bar to filter table by name
+
+AdminInventory
+
+Same products table filtered to show stock-focused columns:
+Name, Category, Stock Qty, Status Badge, Last Updated
+Stock badges: In Stock (green), Low Stock < 10 (yellow), Out of Stock (red)
+Click stock number to edit inline, press Enter to save
+Filter: show only Low Stock, show only Out of Stock
+Low stock alert banner at top if any product stock < 10
+
+AdminOrders
+
+Full orders table: Order ID, Customer, Date, Total, Payment Ref, Status, Actions
+Search by Order ID or customer name
+Filter dropdown by status
+Click row to expand: shows full item list + shipping address
+Status dropdown per row: change triggers StoreContext.updateOrderStatus()
+Mock email notification: show a toast "Email sent to [customer email]" on status change
+
+AdminAnalytics
+
+Monthly Revenue Bar Chart (recharts BarChart):
+
+X-axis: Jan to Dec
+Y-axis: PHP amount
+Data: aggregate order totals by createdAt month
+
+
+Sales by Category Pie Chart (recharts PieChart):
+
+Aggregate revenue by product category from order items
+
+
+Top 10 Best-Selling Products table:
+
+Rank, Product Name, Category, Units Sold (soldCount), Revenue
+Sorted by soldCount descending
+
+
+CSV Export button:
+
+Exports all orders as CSV
+Columns: Order ID, Customer, Email, Items, Total, Status, Date
+
+
+
+
+8. Utility Functions
+Currency Formatter
+jsconst formatPHP = (amount) =>
+  new Intl.NumberFormat('en-PH', { style: 'currency', currency: 'PHP' }).format(amount);
+GCash Reference Generator
+jsconst generateGCashRef = () =>
+  Array.from({ length: 13 }, () => Math.floor(Math.random() * 10)).join('');
+Order ID Generator
+jsconst generateOrderId = () =>
+  `ORD-2025-${String(Date.now()).slice(-4).padStart(4, '0')}`;
+CSV Export
+jsconst exportOrdersCSV = (orders) => {
+  const headers = ['Order ID', 'Customer', 'Email', 'Total', 'Status', 'Date'];
+  const rows = orders.map(o =>
+    [o.id, o.customerName, o.customerEmail, o.total, o.status, o.createdAt].join(',')
+  );
+  const csv = [headers.join(','), ...rows].join('\n');
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'tilematch_orders.csv';
+  a.click();
+  URL.revokeObjectURL(url);
+};
+Email Validator
+jsconst isValidEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+VAT + Shipping Calculator
+jsconst TAX_RATE = 0.12;
+const SHIPPING_FEE = 200;
+const FREE_SHIPPING_THRESHOLD = 2000;
+
+const calculateTotals = (subtotal) => {
+  const shipping = subtotal >= FREE_SHIPPING_THRESHOLD ? 0 : SHIPPING_FEE;
+  const tax = subtotal * TAX_RATE;
+  const total = subtotal + shipping + tax;
+  return { shipping, tax, total };
+};
+
+9. Design System
+Colors
+Primary (Dark Green):  #2D5016
+Accent (Gold):         #C9A84C
+Background:            #F5F2EE
+Surface (Card):        #FFFFFF
+Border:                #E0D8CE
+Text Primary:          #1A1A1A
+Text Secondary:        #666666
+Success:               #22C55E
+Warning:               #F59E0B
+Error:                 #EF4444
+Typography
+Headings:  Georgia, serif
+Body:      Inter, system-ui, sans-serif
+Size scale: 12px | 14px | 16px | 20px | 24px | 32px | 48px
+Spacing
+Base unit: 8px
+xs: 4px  |  sm: 8px  |  md: 16px  |  lg: 24px  |  xl: 32px  |  2xl: 48px
+Responsive Breakpoints
+Mobile:   320px  — single column, hamburger menu
+Tablet:   768px  — 2-column grid, collapsible sidebar
+Desktop:  1024px — 4-column grid, full sidebar visible
+Wide:     1920px — max-width 1400px centered
+Component Styles
+
+Cards: white bg, 1px border (#E0D8CE), 8px border-radius, subtle box-shadow
+Buttons (Primary): #2D5016 bg, white text, 6px border-radius, hover darken 10%
+Buttons (Secondary): white bg, #2D5016 border + text, hover bg tint
+Inputs: white bg, 1px border, 6px border-radius, focus outline #C9A84C
+Badges: small pill shape, color-coded per status
+
+
+10. Build Order
+Build in this exact sequence to avoid dependency errors.
+
+MOCK_DATA object (products, orders, users)
+Utility functions (formatPHP, generateGCashRef, calculateTotals, exportCSV)
+AuthContext + useAuth hook
+CartContext + useCart hook
+StoreContext + useStore hook
+Navbar component (logo, nav links, cart count badge, login/admin buttons)
+Footer component
+HomePage
+ShopPage + ProductCard + FilterSidebar
+ProductDetailPage
+CartPage
+CheckoutPage (Step 1: shipping, Step 2: GCash)
+OrderConfirmationPage
+OrderTrackingPage
+AccountPage (login, register, profile + order history)
+AdminDashboard
+AdminProducts (CRUD + modal)
+AdminInventory (inline stock edit)
+AdminOrders (status update + toast)
+AdminAnalytics (charts + CSV export)
+Root App component (activePage state, conditional rendering, provider wrapping)
+Final pass: responsive CSS, empty states, error states, toast notifications

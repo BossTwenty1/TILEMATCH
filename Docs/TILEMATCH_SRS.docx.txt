@@ -1,0 +1,665 @@
+Name: Mapula, Nash A.
+       Mirandilla, Keiron A.
+       Nuyda, Michael Riggs C.
+       Rosales, Francis Josh B.​             ​                                          ​
+Course / Block & Year: BSIT – 3C​            ​                                02/27/2025
+Subject: E-COMMERCE
+
+                     TILEMATCH E-COMMERCE PLATFORM
+                SOFTWARE REQUIREMENTS SPECIFICATION (SRS)
+
+   1.​ INTRODUCTION
+   1.1​Purpose
+              This document describes the requirements of the TileMatch E-Commerce
+       Platform. The system allows customers to browse tile products, place orders,
+       and pay via GCash, while administrators manage products and orders. The
+       system provides a centralized online platform for tile retail, enabling convenient
+       purchasing without requiring visits to physical showrooms.
+
+   1.2​Scope
+
+   Include:
+
+      ●​   Online product browsing and search: Customers can view tile products
+           organized by category, search by keywords, and filter by price, size, material,
+           and color to find tiles matching their needs.
+
+      ●​   Product filtering by category, color, size, material: Advanced filtering allows
+           customers to narrow down product selection based on multiple criteria
+           simultaneously for efficient shopping.
+
+      ●​   Shopping cart management: Customers can add and remove items from cart,
+           adjust quantities, and save cart contents for later purchase with persistent
+           storage across sessions.
+
+      ●​   Checkout and order placement: Streamlined checkout process where
+           customers enter shipping address and review order details before finalizing
+           purchase.
+
+      ●​   GCash payment recording: Payment method captured and recorded in order
+           database using GCash payment reference system without live API
+           integration.
+
+      ●​   Order tracking and status updates: Customers can view order history, track
+           current order status, and receive email notifications when status changes.
+
+      ●​   Customer account management: Users can register, login, update profile
+           information, and reset forgotten passwords via email.
+
+      ●​   Admin product management: Store administrators can add, edit, and delete
+           tile products; upload images; and manage product categories.
+
+      ●​   Admin order management: Administrators can view all customer orders,
+           update order status, and send status notifications.
+
+      ●​   Sales reporting and analytics: Dashboard displays key metrics including total
+           revenue, order count, best-selling products, and monthly sales trends.
+
+   Exclude:
+Name: Mapula, Nash A.
+       Mirandilla, Keiron A.
+       Nuyda, Michael Riggs C.
+       Rosales, Francis Josh B.​              ​                                          ​
+Course / Block & Year: BSIT – 3C​             ​                                02/27/2025
+Subject: E-COMMERCE
+
+      ●​   Real money processing: System uses test GCash payments only, no actual
+           financial transactions processed.
+
+      ●​   Physical warehouse operations: System does not handle physical inventory
+           storage or warehouse management.
+
+      ●​   Courier logistics integration: No direct API integration with delivery partners;
+           tracking number entered manually by admin.
+
+      ●​   Customer reviews and ratings: Product review and rating features not
+           included in this phase.
+
+      ●​   Multi-vendor marketplace: System supports single store only, not multiple
+           sellers.
+
+      ●​   Mobile native app: Web-based application only; no dedicated iOS or Android
+           app development.
+
+
+
+   1.3 Intended Users
+
+      ●​   Customers (residential homeowners and small contractors): End users who
+           browse tile products online and purchase for renovation projects. They need
+           an easy-to-use interface, clear product information, and secure checkout
+           process.
+
+      ●​   Store Administrator (product and order manager): Business user responsible
+           for managing product catalog, updating inventory, processing customer
+           orders, and generating sales reports. Needs admin dashboard with intuitive
+           controls.
+
+
+
+   1.4 Definitions
+
+      ●​   Cart: Temporary list of items selected for purchase
+
+      ●​   Checkout: Process of confirming purchase and entering shipping details
+
+      ●​   Order: Confirmed transaction with assigned order number
+
+      ●​   Stock: Available quantity of a product in inventory
+
+      ●​   Order Status: Current state of an order (Pending, Processing, Shipped,
+           Delivered)
+
+      ●​   GCash: Mobile payment method used for transactions
+
+      ●​   Category: Group of similar tile products (Ceramic, Porcelain, Glass, etc.)
+Name: Mapula, Nash A.
+       Mirandilla, Keiron A.
+       Nuyda, Michael Riggs C.
+       Rosales, Francis Josh B.​            ​                                         ​
+Course / Block & Year: BSIT – 3C​           ​                               02/27/2025
+Subject: E-COMMERCE
+
+   2.​ OVERALL DESCRIPTION
+   2.1 System Overview
+
+The TileMatch system operates as follows:
+
+           Customer registers and logs in → browses tile products → searches and
+   filters by preferences → selects product and views details → adds items to cart →
+   proceeds to checkout → enters shipping address → selects GCash payment →
+   receives payment reference → transfers payment → order is confirmed → customer
+   receives confirmation email → customer can track order status → admin receives
+   order notification → admin updates order status → customer receives status update
+   emails.
+
+   2.2 System Features (High Level)
+
+      ●​   User registration and login with email verification: Customers create secure
+           accounts using email and password, with email confirmation to verify account
+           ownership.
+
+      ●​   Product catalog with tiles organized by category: Complete inventory of tile
+           products organized into 5 main categories (Ceramic, Porcelain, Glass,
+           Natural Stone, Decorative) for easy browsing.
+
+      ●​   Advanced search and filtering capabilities: Customers can search by product
+           name, color, material, size and apply multiple filters simultaneously to find
+           specific tiles.
+
+      ●​   Shopping cart with persistent storage: Customers can add items to cart, and
+           cart contents are saved in the database so items remain even if customer
+           logs out.
+
+      ●​   Checkout with address validation: Secure checkout process that collects and
+           validates shipping address information before order confirmation.
+
+      ●​   GCash payment integration: Payment method using GCash reference system
+           where customers receive payment reference number to complete transaction.
+
+      ●​   Order tracking and history: Customers can view all past orders and track
+           current order status with estimated delivery date.
+
+      ●​   Order status management: Admin updates order status through dashboard
+           (Pending → Processing → Shipped → Delivered) with automatic customer
+           notifications.
+
+      ●​   Admin dashboard with overview metrics: Main admin page displaying key
+           business metrics including revenue, order count, customer count, and recent
+           orders.
+
+      ●​   Product management (add, edit, delete): Admin interface allowing
+           administrators to add new products, modify existing product information, and
+           remove discontinued items.
+Name: Mapula, Nash A.
+       Mirandilla, Keiron A.
+       Nuyda, Michael Riggs C.
+       Rosales, Francis Josh B.​              ​                                         ​
+Course / Block & Year: BSIT – 3C​             ​                               02/27/2025
+Subject: E-COMMERCE
+
+        ●​   Order management interface: Dedicated admin page showing all customer
+             orders with search, filter, and update capabilities.
+
+        ●​   Sales reports and analytics: Dashboard generating reports on total revenue,
+             best-selling products, monthly sales trends, and sales breakdown by
+             category.
+
+        ●​   Email notifications for orders and updates: Automated emails sent to
+             customers for order confirmation, status updates, and delivery notifications.
+
+
+
+        2.3 User Roles
+
+Role                 Description
+                     Browses products, searches, adds to cart, makes purchases, tracks
+Customer
+                     orders, manages account.
+
+
+Admin                Adds/edits/deletes products, manages inventory, updates order
+                     status, generates reports, views customer list.
+
+
+
+   2.4 Operating Environment
+
+        ●​   Web browsers: Chrome, Firefox, Safari, Edge: System accessible through
+             standard web browsers on any operating system. No browser plugins
+             required.
+
+        ●​   Devices: Desktop computers, tablets, smartphones: Application designed with
+             responsive layout to function properly on devices with screen sizes ranging
+             from 320px (mobile) to 1920px (desktop).
+
+        ●​   Internet connection: Required for all operations including browsing,
+             purchasing, and order tracking. Users need a stable internet for a smooth
+             experience.
+
+        ●​   Server: Free hosting platform (Heroku, Replit, or similar): Application
+             deployed on free hosting services providing cost-effective deployment for
+             educational/demo purposes.
+
+        ●​   Database: MySQL 8.0: Relational database system stores all product,
+             customer, and order data with reliable backup and recovery capabilities.
+
+        ●​   Email Service: Gmail SMTP: Third-party email service handles sending order
+             confirmations, status updates, and notifications reliably at scale.
+
+
+
+   2.5 Assumptions
+
+        ●​   Users have internet access for browsing and purchasing
+
+        ●​   Payment is simulated using GCash payment reference system (no live API
+             integration)
+Name: Mapula, Nash A.
+       Mirandilla, Keiron A.
+       Nuyda, Michael Riggs C.
+       Rosales, Francis Josh B.​              ​                                           ​
+Course / Block & Year: BSIT – 3C​             ​                                 02/27/2025
+Subject: E-COMMERCE
+
+        ●​   Customers have valid email addresses for order confirmations
+
+        ●​   Admin users are trained on system usage
+
+        ●​   The retailer manages all physical deliveries and order fulfillment directly
+             through an in-house logistics system.
+
+
+
+   3.​ FUNCTIONAL REQUIREMENTS
+3.1 User Account Management
+
+   ●​   FR-01: The system shall allow users to register with email, password, full name,
+        and address
+
+   ●​   FR-02: The system shall validate email format (must contain @) and check for
+        duplicate emails
+
+   ●​   FR-03: The system shall send email confirmation after successful registration
+
+   ●​   FR-04: The system shall allow registered users to log in with email and password
+
+   ●​   FR-05: The system shall maintain user sessions across pages
+
+   ●​   FR-06: The system shall allow users to log out and end their session
+
+   ●​   FR-07: The system shall allow users to update their profile information
+
+   ●​   FR-08: The system shall allow users to reset forgotten passwords via email
+
+   ●​   FR-09: The system shall authenticate admin users separately from customers
+
+3.2 Product Browsing
+
+   ●​   FR-10: The system shall display all tile products in a catalog
+
+   ●​   FR-11: The system shall organize products by 5 categories (Ceramic, Porcelain,
+        Glass, Natural Stone, Decorative)
+
+   ●​   FR-12: The system shall allow users to search products by name, color, material,
+        or size
+
+   ●​   FR-13: The system shall filter products by price range, tile size, material type,
+        and room application
+
+   ●​   FR-14: The system shall sort products by price (low to high, high to low), newest,
+        and best sellers
+
+   ●​   FR-15: The system shall display product details including images, specifications,
+        price, and stock status
+
+   ●​   FR-16: The system shall show multiple images for each product with zoom
+        capability
+
+   ●​   FR-17: The system shall indicate if a product is in stock or out of stock
+
+3.3 Shopping Cart
+
+   ●​   FR-18: The system shall allow users to add items to shopping cart with specified
+        quantity
+Name: Mapula, Nash A.
+       Mirandilla, Keiron A.
+       Nuyda, Michael Riggs C.
+       Rosales, Francis Josh B.​             ​                                           ​
+Course / Block & Year: BSIT – 3C​            ​                                 02/27/2025
+Subject: E-COMMERCE
+
+   ●​   FR-19: The system shall display added item confirmation message
+
+   ●​   FR-20: The system shall display current cart count on navigation bar
+
+   ●​   FR-21: The system shall allow users to view cart contents showing items,
+        quantities, and prices
+
+   ●​   FR-22: The system shall calculate and display subtotal, tax, shipping cost, and
+        total price
+
+   ●​   FR-23: The system shall allow users to increase or decrease item quantity in cart
+
+   ●​   FR-24: The system shall allow users to remove items from cart
+
+   ●​   FR-25: The system shall update totals automatically when quantities change
+
+   ●​   FR-26: The system shall save cart in database (persistent cart across sessions)
+
+   ●​   FR-27: The system shall allow users to proceed to checkout from cart page
+
+3.4 Checkout and Orders
+
+   ●​   FR-28: The system shall display checkout page with order review
+
+   ●​   FR-29: The system shall collect shipping address information (municipality, city,
+        street and house number, barangay, postal code)
+
+   ●​   FR-30: The system shall validate address format before proceeding
+
+   ●​   FR-31: The system shall display order summary with items and total amount
+
+   ●​   FR-32: The system shall allow users to modify address before finalizing order
+
+   ●​   FR-33: The system shall generate unique order number for each transaction
+
+   ●​   FR-34: The system shall save order record to database with customer info,
+        items, and address
+
+   ●​   FR-35: The system shall set initial order status as "Pending"
+
+   ●​   FR-36: The system shall clear shopping cart after order creation
+
+3.5 Payment
+
+   ●​   FR-37: The system shall display GCash payment instructions at checkout
+
+   ●​   FR-38: The system shall show payment reference number for transaction
+
+   ●​   FR-39: The system shall display amount to pay and GCash account details
+
+   ●​   FR-40: The system shall record payment method as GCash in order record
+
+   ●​   FR-41: The system shall allow customer to confirm payment completion
+
+   ●​   FR-42: The system shall mark order status based on payment confirmation
+
+3.6 Order Tracking
+
+   ●​   FR-43: The system shall display customer order history with all past orders
+
+   ●​   FR-44: The system shall show order status (Pending, Processing, Shipped,
+        Delivered)
+Name: Mapula, Nash A.
+       Mirandilla, Keiron A.
+       Nuyda, Michael Riggs C.
+       Rosales, Francis Josh B.​              ​                                          ​
+Course / Block & Year: BSIT – 3C​             ​                                02/27/2025
+Subject: E-COMMERCE
+
+   ●​   FR-45: The system shall display order date, total amount, and items ordered
+
+   ●​   FR-46: The system shall show estimated delivery date
+
+   ●​   FR-47: The system shall allow customers to click order for detailed information
+
+
+
+3.7 Order Notifications
+
+   ●​   FR-48: The system shall send order confirmation email within 5 minutes of
+        purchase
+
+   ●​   FR-49: The system shall include items, and total in confirmation email
+
+   ●​   FR-50: The system shall send status update email when admin changes order
+        status
+
+   ●​   FR-51: The system shall send shipping notification when shipped
+
+   ●​   FR-522: The system shall send delivery confirmation when order delivered
+
+3.8 Admin Product Management
+
+   ●​   FR-53: The system shall allow admin to access product management interface
+
+   ●​   FR-54: The system shall allow admin to add new products with name, price,
+        category, and specifications
+
+   ●​   FR-55: The system shall allow admin to upload multiple images for each product
+
+   ●​   FR-56: The system shall validate required fields when adding products
+
+   ●​   FR-57: The system shall allow admin to edit existing product information
+
+   ●​   FR-58: The system shall allow admin to delete products from catalog
+
+   ●​   FR-59: The system shall allow admin to organize products by category
+
+   ●​   FR-60: The system shall allow admin to update product pricing
+
+   ●​   FR-61: The system shall allow bulk product upload via CSV file
+
+3.9 Inventory Management
+
+   ●​   FR-62: The system shall track stock quantity for each product
+
+   ●​   FR-63: The system shall display stock status (in stock, low stock, out of stock)
+
+   ●​   FR-64: The system shall trigger low-stock alert when quantity falls below
+        threshold
+
+   ●​   FR-65: The system shall automatically decrease stock when order is placed
+
+   ●​   FR-66: The system shall allow admin to manually adjust stock quantities
+
+   ●​   FR-67: The system shall prevent sales of out-of-stock items
+
+3.10 Admin Order Management
+
+   ●​   FR-68: The system shall display all customer orders in admin dashboard
+Name: Mapula, Nash A.
+       Mirandilla, Keiron A.
+       Nuyda, Michael Riggs C.
+       Rosales, Francis Josh B.​                ​                                       ​
+Course / Block & Year: BSIT – 3C​               ​                             02/27/2025
+Subject: E-COMMERCE
+
+   ●​   FR-69: The system shall allow admin to view order details including items and
+        address
+
+   ●​   FR-70: The system shall allow admin to change order status (Pending →
+        Processing → Shipped → Completed)
+
+   ●​   FR-71: The system shall automatically send status update email to customer
+
+   ●​   FR-72: The system shall allow admin to search and filter orders
+
+   ●​   FR-73: The system shall display order date, customer name, and total amount
+
+3.11 Admin Reporting
+
+   ●​   FR-74: The system shall display total revenue and order count on dashboard
+
+   ●​   FR-75: The system shall show number of customers and recent orders
+
+   ●​   FR-76: The system shall generate sales summary report with total revenue by
+        date range
+
+   ●​   FR-77: The system shall generate best-selling products report (top 10)
+
+   ●​   FR-78: The system shall generate monthly sales chart showing trends
+
+   ●​   FR-79: The system shall generate sales breakdown by category
+
+   ●​   FR-80: The system shall allow admin to export reports to CSV format
+
+
+
+   4.​ EXTERNAL INTERFACE REQUIREMENTS
+4.1 User Interface
+
+   ●​   Web pages: Homepage, Product Listing, Product Detail, Shopping Cart,
+        Checkout, Order Confirmation, Order Tracking, Customer Dashboard, Customer
+        Profile
+
+   ●​   Admin pages: Admin Login, Admin Dashboard, Product Management, Product
+        List, Inventory Management, Order Management, Order Details, Reports, Sales
+        Analytics
+
+   ●​   Responsive layout that adapts to mobile (320px), tablet (768px), and desktop
+        (1920px) screens
+
+   ●​   Clear navigation menu, search bar, shopping cart icon, login/logout buttons
+
+   ●​   Intuitive buttons and labels for all actions
+
+4.2 Hardware Interface
+
+   ●​   Smartphone (iOS/Android)
+
+   ●​   Tablet (iPad, Android tablet)
+
+   ●​   Desktop computer (Windows, Mac, Linux)
+
+   ●​   Minimum screen resolution: 320px width
+
+4.3 Software Interface
+Name: Mapula, Nash A.
+       Mirandilla, Keiron A.
+       Nuyda, Michael Riggs C.
+       Rosales, Francis Josh B.​               ​                                    ​
+Course / Block & Year: BSIT – 3C​              ​                          02/27/2025
+Subject: E-COMMERCE
+
+   ●​   Database: MySQL for data storage
+
+   ●​   Email Service: Gmail SMTP for sending notifications
+
+   ●​   Web Server: Apache or Nginx for hosting
+
+   ●​   Payment Reference System: Manual GCash payment reference (no external
+        API)
+
+
+
+   5.​ NON-FUNCTIONAL REQUIREMENTS
+5.1 Performance
+
+   ●​   Database queries shall respond in under 500 milliseconds
+
+   ●​   Page response time shall remain under 1 second for user actions
+
+   ●​   Images shall load within 2 seconds
+
+5.2 Security
+
+   ●​   User login requires email and password authentication
+
+   ●​   Passwords shall not be stored in plain text
+
+   ●​   Only authenticated admins can access admin features
+
+   ●​   Customers cannot access other customers' personal data
+
+   ●​   Session shall timeout after 30 minutes of inactivity
+
+   ●​   Database access restricted to authorized users only
+
+5.3 Usability
+
+   ●​   Website shall have clear and intuitive navigation
+
+   ●​   All buttons and links clearly labeled and functional
+
+   ●​   Error messages shall be clear and explain how to resolve issues
+
+   ●​   System shall guide users through checkout process step-by-step
+
+   ●​   Mobile version shall be easy to use on small screens
+
+   ●​   Font sizes legible and color contrast sufficient
+
+5.4 Reliability
+
+   ●​   Orders shall be saved reliably to database
+
+   ●​   Email notifications shall be delivered reliably
+
+   ●​   System shall recover gracefully from errors
+
+   ●​   Error messages logged for debugging
+
+5.5 Maintainability
+
+   ●​   Code shall follow consistent naming conventions
+
+   ●​   Code shall be properly documented and commented
+Name: Mapula, Nash A.
+       Mirandilla, Keiron A.
+       Nuyda, Michael Riggs C.
+       Rosales, Francis Josh B.​          ​                 ​
+Course / Block & Year: BSIT – 3C​         ​       02/27/2025
+Subject: E-COMMERCE
+
+   ●​   Database schema shall be well-organized
+Name: Mapula, Nash A.
+       Mirandilla, Keiron A.
+       Nuyda, Michael Riggs C.
+       Rosales, Francis Josh B.​            ​                                    ​
+Course / Block & Year: BSIT – 3C​           ​                          02/27/2025
+Subject: E-COMMERCE
+
+        6. DATABASE REQUIREMENTS
+ERD:
+
+
+
+
+Main Database Tables:
+
+   ●​   Customers
+   ●​   Cart, and CartItem
+   ●​   Product, Characteristics, Inventory, and Supplier
+   ●​   Order, and OrderItem
+   ●​   Payment
+   ●​   Sales table and Losses Table
+   ●​   Promo (parent table) and Freebie and Markdown (child tables)
+
+
+
+   7.​ ACCEPTANCE CRITERIA
+
+The system is accepted if:
+
+   ●​   Users can register with valid email and password
+
+   ●​   Users can log in and access their account
+Name: Mapula, Nash A.
+       Mirandilla, Keiron A.
+       Nuyda, Michael Riggs C.
+       Rosales, Francis Josh B.​             ​                                          ​
+Course / Block & Year: BSIT – 3C​            ​                                02/27/2025
+Subject: E-COMMERCE
+
+   ●​   Users can browse tile products with accurate information
+
+   ●​   Users can search products by name, color, material, and size
+
+   ●​   Users can filter products by price range and category
+
+   ●​   Users can add items to cart and view cart contents
+
+   ●​   Users can proceed through checkout and enter shipping address
+
+   ●​   Users can view GCash payment instructions and payment reference
+
+   ●​   Users can complete order and receive confirmation email within 5 minutes
+
+   ●​   Users can track order status and view order history
+
+   ●​   Admin can add new products with images and specifications
+
+   ●​   Admin can edit and delete existing products
+
+   ●​   Admin can manage inventory and set stock quantities
+
+   ●​   Admin can view all customer orders in dashboard
+
+   ●​   Admin can update order status and send status updates to customers
+
+   ●​   Admin can generate sales reports and view analytics
+
+   ●​   Admin can export reports to CSV format
+
+   ●​   Email notifications sent successfully for orders and status updates
+
+   ●​   Website displays correctly on desktop, tablet, and mobile
+
+   ●​   All pages load within 5 seconds
+
+   ●​   Order data saved reliably to database
+
+   ●​   No data loss or corruption occurs
+
