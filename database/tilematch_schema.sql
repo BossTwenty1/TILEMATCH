@@ -61,7 +61,7 @@ CREATE TABLE products (
   size             VARCHAR(20) NOT NULL,       -- e.g. '30x30', '60x60'
   room_application VARCHAR(50),                -- Floor | Wall | Outdoor | Bathroom | Kitchen
   price            DECIMAL(10,2) NOT NULL,
-  image_url        VARCHAR(500),
+  image_url        LONGTEXT,
   is_active        BOOLEAN NOT NULL DEFAULT TRUE,
   sold_count       INT NOT NULL DEFAULT 0,
   supplier_id      INT,
@@ -81,7 +81,7 @@ CREATE TABLE products (
 CREATE TABLE product_images (
   id          INT AUTO_INCREMENT PRIMARY KEY,
   product_id  INT NOT NULL,
-  image_url   VARCHAR(500) NOT NULL,
+  image_url   LONGTEXT NOT NULL,
   sort_order  INT NOT NULL DEFAULT 0,
   created_at  TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE
@@ -275,3 +275,6 @@ CREATE TABLE email_logs (
   sent_at     TIMESTAMP NULL,
   created_at  TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB;
+
+USE tilematch_db;
+ALTER TABLE products MODIFY COLUMN image_url LONGTEXT;
