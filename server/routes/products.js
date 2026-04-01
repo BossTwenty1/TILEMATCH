@@ -83,9 +83,8 @@ router.get('/', async (req, res) => {
 
     // Pagination
     const offset = (Number(page) - 1) * Number(limit);
-    sql += ` LIMIT ? OFFSET ?`;
-    params.push(Number(limit), offset);
-
+    sql += ` LIMIT ${Number(limit)} OFFSET ${offset}`;
+    
     const [products] = await db.execute(sql, params);
 
     // Get total count (without LIMIT) for pagination

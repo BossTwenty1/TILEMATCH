@@ -93,12 +93,16 @@ router.post('/products', async (req, res) => {
 // FR-57, FR-60: Edit product
 router.put('/products/:id', async (req, res) => {
   try {
-    const { name, description, category, material, color, size, roomApplication, price, imageUrl, isActive } = req.body;
+    const { name, description, category, material, color, size, roomApplication, price, stock, imageUrl, isActive } = req.body;
 
     await db.execute(
       `UPDATE products SET name=?, description=?, category=?, material=?, color=?, size=?, room_application=?, price=?, image_url=?, is_active=? WHERE id=?`,
       [name, description, category, material, color, size, roomApplication, price, imageUrl, isActive, req.params.id]
     );
+
+    if (stock !== undefined) {
+      await db.execute('UPDATE inventory SET stock_qty = ? WHERE product_id = ?', [stock, req.params.id]);
+    }
     res.json({ message: 'Product updated.' });
   } catch (err) {
     console.error('Update product error:', err);
