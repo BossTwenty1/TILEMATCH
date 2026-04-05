@@ -4,14 +4,7 @@
 -- Based on SRS Section 6 (ERD) + Functional Requirements
 -- ============================================================
 
--- Create and use database
-CREATE DATABASE IF NOT EXISTS tilematch_db
-  CHARACTER SET utf8mb4
-  COLLATE utf8mb4_unicode_ci;
-
-USE tilematch_db;
-
--- ============================================================
+-- Create and use database is handled by the connection config
 -- 1. CUSTOMERS
 -- ============================================================
 CREATE TABLE customers (
@@ -276,5 +269,4 @@ CREATE TABLE email_logs (
   created_at  TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB;
 
-USE tilematch_db;
 ALTER TABLE products MODIFY COLUMN image_url LONGTEXT;

@@ -5,7 +5,9 @@
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
-    "dev": "node --watch server.js"
+    "dev": "node --watch server.js",
+    "db:export": "node scripts/export_products.js",
+    "db:import": "node scripts/import_products.js"
   },
   "keywords": [],
   "author": "",
