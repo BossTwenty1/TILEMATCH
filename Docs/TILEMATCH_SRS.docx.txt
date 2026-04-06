@@ -1,10 +1,3 @@
-Name: Mapula, Nash A.
-       Mirandilla, Keiron A.
-       Nuyda, Michael Riggs C.
-       Rosales, Francis Josh B.​             ​                                          ​
-Course / Block & Year: BSIT – 3C​            ​                                02/27/2025
-Subject: E-COMMERCE
-
                      TILEMATCH E-COMMERCE PLATFORM
                 SOFTWARE REQUIREMENTS SPECIFICATION (SRS)
 
@@ -56,13 +49,6 @@ Subject: E-COMMERCE
            revenue, order count, best-selling products, and monthly sales trends.
 
    Exclude:
-Name: Mapula, Nash A.
-       Mirandilla, Keiron A.
-       Nuyda, Michael Riggs C.
-       Rosales, Francis Josh B.​              ​                                          ​
-Course / Block & Year: BSIT – 3C​             ​                                02/27/2025
-Subject: E-COMMERCE
-
       ●​   Real money processing: System uses test GCash payments only, no actual
            financial transactions processed.
 
@@ -113,12 +99,6 @@ Subject: E-COMMERCE
       ●​   GCash: Mobile payment method used for transactions
 
       ●​   Category: Group of similar tile products (Ceramic, Porcelain, Glass, etc.)
-Name: Mapula, Nash A.
-       Mirandilla, Keiron A.
-       Nuyda, Michael Riggs C.
-       Rosales, Francis Josh B.​            ​                                         ​
-Course / Block & Year: BSIT – 3C​           ​                               02/27/2025
-Subject: E-COMMERCE
 
    2.​ OVERALL DESCRIPTION
    2.1 System Overview
@@ -171,32 +151,24 @@ The TileMatch system operates as follows:
       ●​   Product management (add, edit, delete): Admin interface allowing
            administrators to add new products, modify existing product information, and
            remove discontinued items.
-Name: Mapula, Nash A.
-       Mirandilla, Keiron A.
-       Nuyda, Michael Riggs C.
-       Rosales, Francis Josh B.​              ​                                         ​
-Course / Block & Year: BSIT – 3C​             ​                               02/27/2025
-Subject: E-COMMERCE
+     ●​   Order management interface: Dedicated admin page showing all customer
+          orders with search, filter, and update capabilities.
 
-        ●​   Order management interface: Dedicated admin page showing all customer
-             orders with search, filter, and update capabilities.
+     ●​   Sales reports and analytics: Dashboard generating reports on total revenue,
+          best-selling products, monthly sales trends, and sales breakdown by
+          category.
 
-        ●​   Sales reports and analytics: Dashboard generating reports on total revenue,
-             best-selling products, monthly sales trends, and sales breakdown by
-             category.
-
-        ●​   Email notifications for orders and updates: Automated emails sent to
-             customers for order confirmation, status updates, and delivery notifications.
+     ●​   Email notifications for orders and updates: Automated emails sent to
+          customers for order confirmation, status updates, and delivery notifications.
 
 
 
         2.3 User Roles
 
 Role                 Description
-                     Browses products, searches, adds to cart, makes purchases, tracks
-Customer
-                     orders, manages account.
 
+Customer             Browses products, searches, adds to cart, makes purchases, tracks
+                     orders, manages account.
 
 Admin                Adds/edits/deletes products, manages inventory, updates order
                      status, generates reports, views customer list.
@@ -235,12 +207,6 @@ Admin                Adds/edits/deletes products, manages inventory, updates ord
 
         ●​   Payment is simulated using GCash payment reference system (no live API
              integration)
-Name: Mapula, Nash A.
-       Mirandilla, Keiron A.
-       Nuyda, Michael Riggs C.
-       Rosales, Francis Josh B.​              ​                                           ​
-Course / Block & Year: BSIT – 3C​             ​                                 02/27/2025
-Subject: E-COMMERCE
 
         ●​   Customers have valid email addresses for order confirmations
 
@@ -302,12 +268,6 @@ Subject: E-COMMERCE
 
    ●​   FR-18: The system shall allow users to add items to shopping cart with specified
         quantity
-Name: Mapula, Nash A.
-       Mirandilla, Keiron A.
-       Nuyda, Michael Riggs C.
-       Rosales, Francis Josh B.​             ​                                           ​
-Course / Block & Year: BSIT – 3C​            ​                                 02/27/2025
-Subject: E-COMMERCE
 
    ●​   FR-19: The system shall display added item confirmation message
 
@@ -369,14 +329,7 @@ Subject: E-COMMERCE
 
    ●​   FR-43: The system shall display customer order history with all past orders
 
-   ●​   FR-44: The system shall show order status (Pending, Processing, Shipped,
-        Delivered)
-Name: Mapula, Nash A.
-       Mirandilla, Keiron A.
-       Nuyda, Michael Riggs C.
-       Rosales, Francis Josh B.​              ​                                          ​
-Course / Block & Year: BSIT – 3C​             ​                                02/27/2025
-Subject: E-COMMERCE
+   ●​   FR-44: The system shall show order status (Pending, Processing, Shipped, Delivered)
 
    ●​   FR-45: The system shall display order date, total amount, and items ordered
 
@@ -439,12 +392,6 @@ Subject: E-COMMERCE
 3.10 Admin Order Management
 
    ●​   FR-68: The system shall display all customer orders in admin dashboard
-Name: Mapula, Nash A.
-       Mirandilla, Keiron A.
-       Nuyda, Michael Riggs C.
-       Rosales, Francis Josh B.​                ​                                       ​
-Course / Block & Year: BSIT – 3C​               ​                             02/27/2025
-Subject: E-COMMERCE
 
    ●​   FR-69: The system shall allow admin to view order details including items and
         address
@@ -506,12 +453,6 @@ Subject: E-COMMERCE
    ●​   Minimum screen resolution: 320px width
 
 4.3 Software Interface
-Name: Mapula, Nash A.
-       Mirandilla, Keiron A.
-       Nuyda, Michael Riggs C.
-       Rosales, Francis Josh B.​               ​                                    ​
-Course / Block & Year: BSIT – 3C​              ​                          02/27/2025
-Subject: E-COMMERCE
 
    ●​   Database: MySQL for data storage
 
@@ -576,26 +517,10 @@ Subject: E-COMMERCE
    ●​   Code shall follow consistent naming conventions
 
    ●​   Code shall be properly documented and commented
-Name: Mapula, Nash A.
-       Mirandilla, Keiron A.
-       Nuyda, Michael Riggs C.
-       Rosales, Francis Josh B.​          ​                 ​
-Course / Block & Year: BSIT – 3C​         ​       02/27/2025
-Subject: E-COMMERCE
 
    ●​   Database schema shall be well-organized
-Name: Mapula, Nash A.
-       Mirandilla, Keiron A.
-       Nuyda, Michael Riggs C.
-       Rosales, Francis Josh B.​            ​                                    ​
-Course / Block & Year: BSIT – 3C​           ​                          02/27/2025
-Subject: E-COMMERCE
 
         6. DATABASE REQUIREMENTS
-ERD:
-
-
-
 
 Main Database Tables:
 
@@ -616,12 +541,6 @@ The system is accepted if:
    ●​   Users can register with valid email and password
 
    ●​   Users can log in and access their account
-Name: Mapula, Nash A.
-       Mirandilla, Keiron A.
-       Nuyda, Michael Riggs C.
-       Rosales, Francis Josh B.​             ​                                          ​
-Course / Block & Year: BSIT – 3C​            ​                                02/27/2025
-Subject: E-COMMERCE
 
    ●​   Users can browse tile products with accurate information
 
@@ -662,4 +581,3 @@ Subject: E-COMMERCE
    ●​   Order data saved reliably to database
 
    ●​   No data loss or corruption occurs
-

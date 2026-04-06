@@ -22,17 +22,48 @@ CREATE TABLE customers (
   last_name   VARCHAR(100) NOT NULL,
   phone       VARCHAR(20),
   role        ENUM('customer', 'admin') NOT NULL DEFAULT 'customer',
-  -- Address fields (FR-29)
+  -- CHANGE 1: Truncate columns
+/*  -- Address fields (FR-29)
   municipality VARCHAR(100),
   city         VARCHAR(100),
   barangay     VARCHAR(100),
   street       VARCHAR(255),                  -- street + house number
-  postal_code  VARCHAR(10),
+  postal_code  VARCHAR(10),*/
   is_verified  BOOLEAN NOT NULL DEFAULT FALSE,
   created_at   TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at   TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   INDEX idx_email (email),
   INDEX idx_role (role)
+) ENGINE=InnoDB;
+
+-- CHANGE 2: CREATE TABLES
+CREATE TABLE address (
+  id            INT AUTO_INCREMENT PRIMARY KEY,
+  barangay_id   INT,
+  street        VARCHAR(255) NOT NULL,
+  FOREIGN KEY (barangay_id) REFERENCES barangay(id) ON DELETE SET NULL
+) ENGINE=InnoDB;
+
+CREATE TABLE barangay (
+  id                INT AUTO_INCREMENT PRIMARY KEY,
+  municipality_id   INT,
+  name              VARCHAR(255) NOT NULL,
+  FOREIGN KEY (municipality_id) REFERENCES municipality(id) ON DELETE SET NULL
+) ENGINE=InnoDB;
+
+CREATE TABLE municipality (
+  id            INT AUTO_INCREMENT PRIMARY KEY,
+  name          VARCHAR(255) NOT NULL,
+  zip_code      VARCHAR(10) NOT NULL
+) ENGINE=InnoDB;
+
+CREATE TABLE occupancy (
+  id            INT AUTO_INCREMENT PRIMARY KEY,
+  customer_id   INT,
+  address_id    INT,
+  date_set      DATE,
+  FOREIGN KEY customer_id REFERENCES customer(id) ON DELETE SET NULL
+  FOREIGN KEY address_id REFERENCES address(id) ON DELETE SET NULL
 ) ENGINE=InnoDB;
 
 -- ============================================================
@@ -142,14 +173,21 @@ CREATE TABLE orders (
   customer_name       VARCHAR(200) NOT NULL,
   customer_email      VARCHAR(255) NOT NULL,
   -- Shipping address snapshot
-  ship_municipality   VARCHAR(100) NOT NULL,
+  -- CHANGE 3: ship -> delivery
+/*  ship_municipality   VARCHAR(100) NOT NULL,
   ship_city           VARCHAR(100) NOT NULL,
   ship_barangay       VARCHAR(100) NOT NULL,
   ship_street         VARCHAR(255) NOT NULL,
-  ship_postal_code    VARCHAR(10) NOT NULL,
+  ship_postal_code    VARCHAR(10) NOT NULL,*/
+  delivery_municipality   VARCHAR(100) NOT NULL,
+  delivery_city           VARCHAR(100) NOT NULL,
+  delivery_barangay       VARCHAR(100) NOT NULL,
+  delivery_street         VARCHAR(255) NOT NULL,
+  delivery_postal_code    VARCHAR(10) NOT NULL,
   subtotal            DECIMAL(10,2) NOT NULL,
   tax                 DECIMAL(10,2) NOT NULL,         -- 12% VAT
-  shipping_fee        DECIMAL(10,2) NOT NULL,
+  --shipping_fee        DECIMAL(10,2) NOT NULL,
+  delivery_fee        DECIMAL(10,2) NOT NULL,
   total               DECIMAL(10,2) NOT NULL,
   status              ENUM('Pending', 'Processing', 'Shipped', 'Delivered') NOT NULL DEFAULT 'Pending',
   estimated_delivery  DATE,
@@ -221,16 +259,39 @@ CREATE TABLE losses (
   FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE RESTRICT
 ) ENGINE=InnoDB;
 
+-- CHANGE 4: Create table
+CREATE TABLE product_promo (
+  id                  INT AUTO_INCREMENT PRIMARY KEY,
+  product_id          INT,
+  freebie_product_id  INT,
+  promo_id            INT NOT NULL,
+  category            ENUM('Ceramic', 'Porcelain', 'Glass', 'Natural Stone', 'Decorative'),
+  start_date          DATE NOT NULL,
+  end_date            DATE NOT NULL,
+  available_amt       INT NOT NULL DEFAULT 0,
+  is_active           BOOLEAN NOT NULL DEFAULT TRUE,
+  FOREIGN KEY (product_id) REFERENCES product(id) ON DELETE CASCADE,
+  FOREIGN KEY (promo_id) REFERENCES promo(id) ON DELETE CASCADE,
+  FOREIGN KEY (freebie_product_id) REFERENCES product(id) ON DELETE CASCADE,
+  CONSTRAINT CHK_Product_XOR_Category CHECK ( 
+    (product_id IS NULL AND category IS NOT NULL) 
+    OR 
+    (product_id IS NOT NULL AND category IS NULL) 
+  )
+) ENGINE=InnoDB;
+
 -- ============================================================
 -- 13. PROMOS (parent table)
 -- ============================================================
 CREATE TABLE promos (
   id          INT AUTO_INCREMENT PRIMARY KEY,
   name        VARCHAR(255) NOT NULL,
-  promo_type  ENUM('Freebie', 'Markdown') NOT NULL,
-  start_date  DATE NOT NULL,
+  -- CHANGE 5: Truncate columns
+  /*start_date  DATE NOT NULL,
   end_date    DATE NOT NULL,
-  is_active   BOOLEAN NOT NULL DEFAULT TRUE,
+  available_amt INT NOT NULL DEFAULT 0,
+  is_active   BOOLEAN NOT NULL DEFAULT TRUE,*/
+  promo_type  ENUM('Freebie', 'Markdown') NOT NULL,
   created_at  TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB;
 
@@ -238,29 +299,36 @@ CREATE TABLE promos (
 -- 14. FREEBIES (child of promos)
 -- ============================================================
 CREATE TABLE freebies (
-  id              INT AUTO_INCREMENT PRIMARY KEY,
-  promo_id        INT NOT NULL,
-  product_id      INT NOT NULL,               -- product that triggers the freebie
-  freebie_product_id INT NOT NULL,            -- the free product given
+  -- CHANGE 6: Truncate id and other columns, change promo_id to PRIMARY KEY
+  --id              INT AUTO_INCREMENT PRIMARY KEY,
+  --promo_id        INT NOT NULL,
+  id              INT PRIMARY KEY,
+  --product_id      INT NOT NULL,               -- product that triggers the freebie
+  --freebie_product_id INT NOT NULL,            -- the free product given
   min_quantity    INT NOT NULL DEFAULT 1,      -- min qty to qualify
   freebie_qty     INT NOT NULL DEFAULT 1,      -- qty of freebie given
-  FOREIGN KEY (promo_id) REFERENCES promos(id) ON DELETE CASCADE,
-  FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE,
-  FOREIGN KEY (freebie_product_id) REFERENCES products(id) ON DELETE CASCADE
+  --FOREIGN KEY (promo_id) REFERENCES promos(id) ON DELETE CASCADE,
+  --FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE,
+  --FOREIGN KEY (freebie_product_id) REFERENCES products(id) ON DELETE CASCADE
+  FOREIGN KEY (id) REFERENCES promos(id) ON DELETE CASCADE,
+  CONSTRAINT 
 ) ENGINE=InnoDB;
 
 -- ============================================================
 -- 15. MARKDOWNS (child of promos)
 -- ============================================================
 CREATE TABLE markdowns (
-  id              INT AUTO_INCREMENT PRIMARY KEY,
-  promo_id        INT NOT NULL,
-  product_id      INT,                         -- NULL = applies to category
-  category        ENUM('Ceramic', 'Porcelain', 'Glass', 'Natural Stone', 'Decorative'),
+  -- CHANGE 7: Truncate id and other columns, change promo_id to PRIMARY KEY
+  --id              INT AUTO_INCREMENT PRIMARY KEY,
+  id              INT PRIMARY KEY,
+  --promo_id        INT NOT NULL,
+  --product_id      INT,                         -- NULL = applies to category
+  --category        ENUM('Ceramic', 'Porcelain', 'Glass', 'Natural Stone', 'Decorative'),
   discount_type   ENUM('Percentage', 'Fixed') NOT NULL,
   discount_value  DECIMAL(10,2) NOT NULL,      -- e.g. 20 for 20% or 100 for PHP 100 off
-  FOREIGN KEY (promo_id) REFERENCES promos(id) ON DELETE CASCADE,
-  FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE
+  --FOREIGN KEY (promo_id) REFERENCES promos(id) ON DELETE CASCADE,
+  --FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE
+  FOREIGN KEY (id) REFERENCES promos(id) ON DELETE CASCADE
 ) ENGINE=InnoDB;
 
 -- ============================================================
