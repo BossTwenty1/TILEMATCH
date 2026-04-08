@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { Mail, Phone, MapPin } from 'lucide-react';
+import { Mail, Phone, MapPin, CreditCard, ShieldCheck } from 'lucide-react';
 import './Footer.css';
 
 export default function Footer() {
@@ -8,7 +8,7 @@ export default function Footer() {
       <div className="container">
         <div className="footer-grid">
           <div className="footer-brand">
-            <h3><span style={{color:'var(--primary)'}}>TILE</span><span style={{color:'var(--accent)'}}>MATCH</span></h3>
+            <h3><span style={{ color: 'var(--primary)' }}>TILE</span><span style={{ color: 'var(--accent)' }}>MATCH</span></h3>
             <p>Premium tiles for every space. Transform your home with our curated collection of ceramic, porcelain, glass, natural stone, and decorative tiles.</p>
           </div>
           <div className="footer-links">
@@ -31,9 +31,18 @@ export default function Footer() {
             <p><Phone size={14} /> 0917-TILE-MATCH</p>
             <p><MapPin size={14} /> Naga City, Camarines Sur</p>
           </div>
+          <div className="footer-payments">
+            <h4>Payment Methods</h4>
+            <div className="payment-pills">
+              <span className="payment-pill gcash">GCash</span>
+            </div>
+            <p className="secure-badge" style={{marginTop: 12, display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, color: 'var(--success)'}}>
+              <ShieldCheck size={16} /> Secure Checkout
+            </p>
+          </div>
         </div>
         <div className="footer-bottom">
-          <p>&copy; 2025 TileMatch. All rights reserved.</p>
+          <p>&copy; {new Date().getFullYear()} TileMatch. All rights reserved.</p>
         </div>
       </div>
     </footer>
