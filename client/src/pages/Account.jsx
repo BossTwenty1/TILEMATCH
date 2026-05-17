@@ -63,7 +63,11 @@ export default function Account() {
     setError('');
     setLoading(true);
     try {
-      await register(formData);
+      await register({
+        ...formData,
+        email: formData.registerEmail,
+        password: formData.registerPassword
+      });
       addToast('Account created successfully!');
     } catch (err) {
       setError(err.response?.data?.error || 'Registration failed');
@@ -102,7 +106,7 @@ export default function Account() {
             <div className="card card-body">
               <h3><User size={18} /> Profile</h3>
               <div className="profile-detail"><span>Name</span><strong>{user.firstName} {user.lastName}</strong></div>
-              <div className="profile-detail"><span>Email</span><strong>{user.userEmail}</strong></div>
+              <div className="profile-detail"><span>Email</span><strong>{user.email}</strong></div>
               <div className="profile-detail"><span>Phone</span><strong>{user.phone || '—'}</strong></div>
               <div className="profile-detail"><span>Address</span><strong>
                 {user.address?.street && `${user.address.street}, ${user.address.barangay}, ${user.address.city}, ${user.address.municipality} ${user.address.postalCode}`}
