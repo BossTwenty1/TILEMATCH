@@ -71,7 +71,7 @@ export default function Shop() {
   const handleAddToCart = async (productId) => {
     if (!isLoggedIn) { navigate('/account'); return; }
     try {
-      const { data } = await addItem(productId, 1);
+      const data = await addItem(productId, 1);
       addToast(data.message || 'Added to cart!');
     } catch (err) {
       addToast(err.response?.data?.error || 'Error', 'error');

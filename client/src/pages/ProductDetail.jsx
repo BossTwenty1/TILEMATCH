@@ -30,7 +30,7 @@ export default function ProductDetail() {
   const handleAdd = async () => {
     if (!isLoggedIn) { navigate('/account'); return; }
     try {
-      const { data } = await addItem(product.id, quantity);
+      const data = await addItem(product.id, quantity);
       addToast(data.message || 'Added to cart!');
       setQuantity(1);
     } catch (err) {

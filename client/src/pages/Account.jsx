@@ -114,29 +114,31 @@ export default function Account() {
               </strong></div>
             </div>
 
-            <div className="card card-body">
-              <h3><Package size={18} /> Order History</h3>
-              {orders.length === 0 ? <p className="text-secondary">No orders yet.</p> : (
-                <div className="table-wrapper">
-                  <table>
-                    <thead>
-                      <tr><th>Order #</th><th>Date</th><th>Total</th><th>Status</th><th></th></tr>
-                    </thead>
-                    <tbody>
-                      {orders.map(o => (
-                        <tr key={o.id}>
-                          <td><strong>{o.order_number}</strong></td>
-                          <td>{new Date(o.created_at).toLocaleDateString()}</td>
-                          <td>{formatPHP(o.total)}</td>
-                          <td><span className={`badge badge-${o.status === 'Delivered' ? 'success' : o.status === 'Shipped' ? 'info' : o.status === 'Processing' ? 'warning' : 'primary'}`}>{o.status}</span></td>
-                          <td><button className="btn btn-ghost btn-sm" onClick={() => navigate(`/tracking?order=${o.order_number}`)}><Eye size={14} /></button></td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              )}
-            </div>
+            {user?.role !== 'admin' && (
+              <div className="card card-body">
+                <h3><Package size={18} /> Order History</h3>
+                {orders.length === 0 ? <p className="text-secondary">No orders yet.</p> : (
+                  <div className="table-wrapper">
+                    <table>
+                      <thead>
+                        <tr><th>Order #</th><th>Date</th><th>Total</th><th>Status</th><th></th></tr>
+                      </thead>
+                      <tbody>
+                        {orders.map(o => (
+                          <tr key={o.id}>
+                            <td><strong>{o.order_number}</strong></td>
+                            <td>{new Date(o.created_at).toLocaleDateString()}</td>
+                            <td>{formatPHP(o.total)}</td>
+                            <td><span className={`badge badge-${o.status === 'Delivered' ? 'success' : o.status === 'Shipped' ? 'info' : o.status === 'Processing' ? 'warning' : 'primary'}`}>{o.status}</span></td>
+                            <td><button className="btn btn-ghost btn-sm" onClick={() => navigate(`/tracking?order=${o.order_number}`)}><Eye size={14} /></button></td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         </div>
       </div>
