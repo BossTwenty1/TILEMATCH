@@ -74,7 +74,7 @@ export default function Navbar() {
           {isLoggedIn ? (
             <>
               {isAdmin && <Link to="/admin" className="nav-admin">Admin</Link>}
-              <button className="btn btn-ghost btn-sm hide-mobile" onClick={logout}>Logout</button>
+              <Link to="/account" className="btn btn-sm hide-mobile" style={{ backgroundColor: 'var(--accent-light)', color: 'var(--primary)', fontWeight: '700' }}><User size={16} style={{marginRight: '6px'}}/> My Account</Link>
             </>
           ) : (
             <Link to="/account" className="btn btn-sm" style={{ backgroundColor: 'var(--accent-light)', color: 'var(--primary)', fontWeight: '700' }}>Login</Link>
@@ -107,10 +107,10 @@ export default function Navbar() {
           {isLoggedIn ? (
             <>
               {isAdmin && <Link to="/admin" onClick={() => setMenuOpen(false)}>Admin Dashboard</Link>}
-              <button onClick={() => { logout(); setMenuOpen(false); }}>Logout</button>
+              <Link to="/account" className="btn" style={{ backgroundColor: 'var(--accent-light)', color: 'var(--primary)', fontWeight: '700', marginTop: '10px' }} onClick={() => setMenuOpen(false)}><User size={16} style={{marginRight: '6px'}}/> My Account</Link>
             </>
           ) : (
-            <Link to="/account" className="btn" style={{ backgroundColor: 'var(--accent-light)', color: 'var(--primary)', fontWeight: '700' }} onClick={() => setMenuOpen(false)}>Login</Link>
+            <Link to="/account" className="btn" style={{ backgroundColor: 'var(--accent-light)', color: 'var(--primary)', fontWeight: '700', marginTop: '10px' }} onClick={() => setMenuOpen(false)}>Login</Link>
           )}
         </div>
       </div>
