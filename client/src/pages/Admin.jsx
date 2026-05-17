@@ -109,6 +109,45 @@ export default function Admin() {
       addToast('CSV exported');
     } catch { addToast('Export error','error'); }
   };
+  
+  const handleProductsCSVExport = () => {
+    try {
+      if (products.length === 0) {
+        addToast('No products available to export', 'error');
+        return;
+      }
+
+      // Define columns/headers
+      const headers = 'ID,Name,Category,Material,Color,Size,Room Application,Price (PHP),Stock,Status\n';
+      
+      // Map rows and escape any comma strings safely
+      const rows = products.map(p => {
+        const name = `"${p.name.replace(/"/g, '""')}"`;
+        const category = `"${p.category.replace(/"/g, '""')}"`;
+        const material = `"${p.material.replace(/"/g, '""')}"`;
+        const color = `"${p.color.replace(/"/g, '""')}"`;
+        const size = `"${p.size.replace(/"/g, '""')}"`;
+        const roomApp = `"${(p.room_application || '').replace(/"/g, '""')}"`;
+        const price = p.price;
+        const stock = p.stock_qty ?? 0;
+        const status = p.is_active ? 'Active' : 'Inactive';
+
+        return `${p.id},${name},${category},${material},${color},${size},${roomApp},${price},${stock},${status}`;
+      }).join('\n');
+
+      // Create downloadable blob element
+      const blob = new Blob([headers + rows], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; 
+      a.download = 'tilematch_products.csv'; 
+      a.click();
+      URL.revokeObjectURL(url);
+      addToast('Products CSV exported');
+    } catch {
+      addToast('Export error', 'error');
+    }
+  };
 
   const openEditModal = (p) => {
     setEditProduct(p);
@@ -170,7 +209,10 @@ export default function Admin() {
           <div>
             <div className="admin-toolbar">
               <div className="admin-search"><Search size={16} /><input placeholder="Search products..." value={searchQ} onChange={e => setSearchQ(e.target.value)} /></div>
-              <button className="btn btn-primary" onClick={openAddModal}><Plus size={16} /> Add Product</button>
+              <div className="flex gap-sm">
+                <button className="btn btn-secondary" onClick={handleProductsCSVExport}><Download size={16} /> Export CSV</button>
+                <button className="btn btn-primary" onClick={openAddModal}><Plus size={16} /> Add Product</button>
+              </div>
             </div>
             <div className="table-wrapper"><table><thead><tr><th>Image</th><th>Name</th><th>Category</th><th>Price</th><th>Stock</th><th>Status</th><th>Actions</th></tr></thead><tbody>
               {products.map(p => (
