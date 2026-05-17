@@ -25,13 +25,7 @@ export function AuthProvider({ children }) {
   };
 
   const register = async (formData) => {
-    const payload = {
-      ...formData,
-      email: formData.email || formData.registerEmail,
-    };
-    delete payload.registerEmail;
-
-    const { data } = await authAPI.register(payload);
+    const { data } = await authAPI.register(formData);
     localStorage.setItem('tilematch_token', data.token);
     localStorage.setItem('tilematch_user', JSON.stringify(data.user));
     setUser(data.user);
