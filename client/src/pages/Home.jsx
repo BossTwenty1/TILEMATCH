@@ -5,6 +5,7 @@ import { useCart } from '../context/CartContext';
 import { useToast } from '../context/ToastContext';
 import { useAuth } from '../context/AuthContext';
 import ProductCard from '../components/shop/ProductCard';
+import ReviewsSection from '../components/ReviewsSection';
 import { ArrowRight, Truck, ShieldCheck, RefreshCw, Box, Gem, Droplet, Mountain, Palette } from 'lucide-react';
 import './Home.css';
 
@@ -91,6 +92,9 @@ export default function Home() {
           <div className="trust-item"><RefreshCw size={20} /> <strong>Easy Returns</strong> 30 Days</div>
         </div>
       </section>
+
+      {/* REVIEWS SECTION */}
+      <ReviewsSection />
 
       {/* CATEGORIES */}
       <section className="section container fade-in-section">

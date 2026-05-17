@@ -32,8 +32,8 @@ router.get('/', async (req, res) => {
     // FR-22: Calculate totals
     const subtotal = items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
     const shippingFee = subtotal >= 2000 ? 0 : 200;
-    const tax = subtotal * 0.12;
-    const total = subtotal + shippingFee + tax;
+    const tax = Math.round(subtotal * 0.12 * 100) / 100;
+    const total = Math.round((subtotal + shippingFee + tax) * 100) / 100;
 
     res.json({
       items,
@@ -56,7 +56,7 @@ router.post('/add', async (req, res) => {
 
     // Check product exists and has stock (FR-67)
     const [products] = await db.execute(
-      'SELECT p.id, p.name, i.stock_qty FROM products p LEFT JOIN inventory i ON p.id = i.product_id WHERE p.id = ? AND p.is_active = TRUE',
+      'SELECT p.id, p.name, COALESCE(i.stock_qty, 0) as stock_qty FROM products p LEFT JOIN inventory i ON p.id = i.product_id WHERE p.id = ? AND p.is_active = TRUE',
       [productId]
     );
     if (products.length === 0) return res.status(404).json({ error: 'Product not found.' });

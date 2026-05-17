@@ -4,7 +4,8 @@ import { useToast } from '../context/ToastContext';
 import { adminAPI } from '../services/api';
 import { formatPHP, ORDER_STATUSES } from '../utils/helpers';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend } from 'recharts';
-import { LayoutDashboard, Package, Warehouse, ShoppingCart, BarChart3, Plus, Edit, Trash2, Download, AlertTriangle, X, ChevronDown, Search } from 'lucide-react';
+import { LayoutDashboard, Package, Warehouse, ShoppingCart, BarChart3, Plus, Edit, Trash2, Download, AlertTriangle, X, ChevronDown, Search, MessageSquare, Star } from 'lucide-react';
+import axios from 'axios';
 import './Admin.css';
 
 const TABS = [
@@ -12,7 +13,8 @@ const TABS = [
   { key: 'products', label: 'Products', icon: Package },
   { key: 'inventory', label: 'Inventory', icon: Warehouse },
   { key: 'orders', label: 'Orders', icon: ShoppingCart },
-  { key: 'analytics', label: 'Analytics', icon: BarChart3 }
+  { key: 'analytics', label: 'Analytics', icon: BarChart3 },
+  { key: 'reviews', label: 'Reviews', icon: MessageSquare }
 ];
 const COLORS = ['#2D5016','#C9A84C','#0f52ba','#c4713b','#1a5276'];
 
@@ -27,6 +29,7 @@ export default function Admin() {
   const [monthly, setMonthly] = useState([]);
   const [categories, setCategories] = useState([]);
   const [bestsellers, setBestsellers] = useState([]);
+  const [reviews, setReviews] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [editProduct, setEditProduct] = useState(null);
   const [searchQ, setSearchQ] = useState('');
@@ -49,6 +52,11 @@ export default function Admin() {
       adminAPI.monthlyRevenue().then(({data}) => setMonthly(data)).catch(()=>{});
       adminAPI.categoryRevenue().then(({data}) => setCategories(data)).catch(()=>{});
       adminAPI.bestsellers().then(({data}) => setBestsellers(data)).catch(()=>{});
+    }
+    if (tab === 'reviews') {
+      const storedReviews = JSON.parse(localStorage.getItem('website_reviews') || '[]');
+      storedReviews.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+      setReviews(storedReviews);
     }
   }, [tab, searchQ, invFilter, orderSearch, orderStatusFilter]);
 
@@ -320,6 +328,43 @@ export default function Admin() {
                   <tr key={p.id}><td>{i+1}</td><td><strong>{p.name}</strong></td><td>{p.category}</td><td>{p.sold_count}</td><td>{formatPHP(p.totalRevenue)}</td></tr>
                 ))}
               </tbody></table></div>
+            </div>
+          </div>
+        )}
+        {/* REVIEWS */}
+        {tab === 'reviews' && (
+          <div>
+            <div className="card card-body" style={{marginTop:24}}>
+              <h3>Website Reviews</h3>
+              <div className="table-wrapper">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Rating</th>
+                      <th>Comment</th>
+                      <th>Reviewer</th>
+                      <th>Date</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {reviews.length === 0 && <tr><td colSpan="4">No reviews found.</td></tr>}
+                    {reviews.map(r => (
+                      <tr key={r.id}>
+                        <td>
+                          <div style={{ display: 'flex' }}>
+                            {[...Array(5)].map((_, i) => (
+                              <Star key={i} size={16} fill={i < r.rating ? "var(--primary)" : "none"} color={i < r.rating ? "var(--primary)" : "#ccc"} />
+                            ))}
+                          </div>
+                        </td>
+                        <td style={{ maxWidth: 300, whiteSpace: 'normal' }}>{r.comment}</td>
+                        <td>{r.reviewer_name}</td>
+                        <td>{new Date(r.created_at).toLocaleDateString()}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </div>
           </div>
         )}

@@ -101,6 +101,34 @@ router.get('/', async (req, res) => {
       countSql += ` AND p.category IN (${cats.map(() => '?').join(',')})`;
       countParams.push(...cats);
     }
+    if (material) {
+      const mats = material.split(',');
+      countSql += ` AND p.material IN (${mats.map(() => '?').join(',')})`;
+      countParams.push(...mats);
+    }
+    if (color) {
+      const cols = color.split(',');
+      countSql += ` AND p.color IN (${cols.map(() => '?').join(',')})`;
+      countParams.push(...cols);
+    }
+    if (size) {
+      const sizes = size.split(',');
+      countSql += ` AND p.size IN (${sizes.map(() => '?').join(',')})`;
+      countParams.push(...sizes);
+    }
+    if (room) {
+      const rooms = room.split(',');
+      countSql += ` AND p.room_application IN (${rooms.map(() => '?').join(',')})`;
+      countParams.push(...rooms);
+    }
+    if (minPrice) {
+      countSql += ` AND p.price >= ?`;
+      countParams.push(Number(minPrice));
+    }
+    if (maxPrice) {
+      countSql += ` AND p.price <= ?`;
+      countParams.push(Number(maxPrice));
+    }
 
     const [countResult] = await db.execute(countSql, countParams);
 

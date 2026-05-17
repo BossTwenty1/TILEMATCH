@@ -311,9 +311,14 @@ router.get('/analytics/export-csv', async (req, res) => {
     `);
 
     const headers = 'Order ID,Customer,Email,Total,Status,Date,Payment Ref\n';
-    const rows = orders.map(o =>
-      `${o.order_number},${o.customer_name},${o.customer_email},${o.total},${o.status},${o.created_at},${o.payment_ref || ''}`
-    ).join('\n');
+    const rows = orders.map(o => {
+      const orderNumber = `"${(o.order_number || '').replace(/"/g, '""')}"`;
+      const customerName = `"${(o.customer_name || '').replace(/"/g, '""')}"`;
+      const customerEmail = `"${(o.customer_email || '').replace(/"/g, '""')}"`;
+      const status = `"${(o.status || '').replace(/"/g, '""')}"`;
+      const paymentRef = `"${(o.payment_ref || '').replace(/"/g, '""')}"`;
+      return `${orderNumber},${customerName},${customerEmail},${o.total},${status},${o.created_at},${paymentRef}`;
+    }).join('\n');
 
     res.setHeader('Content-Type', 'text/csv');
     res.setHeader('Content-Disposition', 'attachment; filename=tilematch_orders.csv');
