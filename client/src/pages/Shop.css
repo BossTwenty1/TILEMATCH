@@ -19,6 +19,7 @@
 .empty-state { text-align: center; padding: 80px 20px; }
 .empty-state h3 { margin-bottom: 8px; }
 .empty-state p { color: var(--text-secondary); margin-bottom: 20px; }
+.calculator-toggle { display: flex; align-items: center; gap: 6px; }
 .filter-toggle { display: none; }
 @media (max-width: 768px) {
   .shop-layout { grid-template-columns: 1fr; }

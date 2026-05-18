@@ -5,7 +5,8 @@ import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
 import ProductCard from '../components/shop/ProductCard';
-import { SlidersHorizontal, X } from 'lucide-react';
+import TileCalculator from '../components/shop/TileCalculator';
+import { SlidersHorizontal, X, Calculator } from 'lucide-react';
 import './Shop.css';
 
 const CATEGORIES = ['Ceramic', 'Porcelain', 'Glass', 'Natural Stone', 'Decorative'];
@@ -25,6 +26,7 @@ export default function Shop() {
   });
   const [filterOptions, setFilterOptions] = useState({ materials: [], colors: [] });
   const [showFilters, setShowFilters] = useState(false);
+  const [showCalculator, setShowCalculator] = useState(false);
   const { addItem } = useCart();
   const { addToast } = useToast();
   const { isLoggedIn } = useAuth();
@@ -87,6 +89,9 @@ export default function Shop() {
             <p className="text-secondary">{products.length} products found</p>
           </div>
           <div className="shop-controls">
+            <button className="btn btn-secondary btn-sm calculator-toggle" onClick={() => setShowCalculator(!showCalculator)}>
+              <Calculator size={16} /> Calculator
+            </button>
             <button className="btn btn-secondary btn-sm filter-toggle" onClick={() => setShowFilters(!showFilters)}>
               <SlidersHorizontal size={16} /> Filters {activeFilterCount > 0 && `(${activeFilterCount})`}
             </button>
@@ -98,6 +103,8 @@ export default function Shop() {
             </select>
           </div>
         </div>
+
+        {showCalculator && <TileCalculator onClose={() => setShowCalculator(false)} />}
 
         <div className="shop-layout">
           <aside className={`shop-sidebar ${showFilters ? 'open' : ''}`}>
