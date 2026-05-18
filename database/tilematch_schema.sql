@@ -144,7 +144,7 @@ CREATE TABLE orders (
   tax                 DECIMAL(10,2) NOT NULL,         -- 12% VAT
   shipping_fee        DECIMAL(10,2) NOT NULL,
   total               DECIMAL(10,2) NOT NULL,
-  status              ENUM('Pending', 'Processing', 'Shipped', 'Delivered') NOT NULL DEFAULT 'Pending',
+  status              ENUM('Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled') NOT NULL DEFAULT 'Pending',
   estimated_delivery  DATE,
   created_at          TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at          TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,

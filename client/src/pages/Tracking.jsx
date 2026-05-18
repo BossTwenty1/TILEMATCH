@@ -58,19 +58,26 @@ export default function Tracking() {
               <span className={`badge badge-${order.status === 'Delivered' ? 'success' : order.status === 'Shipped' ? 'info' : order.status === 'Processing' ? 'warning' : 'primary'}`}>{order.status}</span>
             </div>
 
-            <div className="status-timeline">
-              {ORDER_STATUSES.map((s, i) => {
-                const Icon = STATUS_ICONS[i];
-                const isActive = i <= statusIdx;
-                return (
-                  <div key={s} className={`timeline-step ${isActive ? 'active' : ''}`}>
-                    <div className="timeline-icon"><Icon size={20} /></div>
-                    <span>{s}</span>
-                    {i < 3 && <div className={`timeline-line ${i < statusIdx ? 'active' : ''}`} />}
-                  </div>
-                );
-              })}
-            </div>
+            {order.status === 'Cancelled' ? (
+              <div className="alert-error" style={{ textAlign: 'center', marginTop: 24, padding: 16, borderRadius: 8, backgroundColor: '#fee2e2', color: '#b91c1c' }}>
+                <h3>Order Cancelled</h3>
+                <p>This order has been cancelled.</p>
+              </div>
+            ) : (
+              <div className="status-timeline">
+                {['Pending', 'Processing', 'Shipped', 'Delivered'].map((s, i) => {
+                  const Icon = STATUS_ICONS[i];
+                  const isActive = i <= statusIdx;
+                  return (
+                    <div key={s} className={`timeline-step ${isActive ? 'active' : ''}`}>
+                      <div className="timeline-icon"><Icon size={20} /></div>
+                      <span>{s}</span>
+                      {i < 3 && <div className={`timeline-line ${i < statusIdx ? 'active' : ''}`} />}
+                    </div>
+                  );
+                })}
+              </div>
+            )}
 
             <div className="tracking-details">
               <div className="tracking-section">

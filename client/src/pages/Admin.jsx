@@ -271,9 +271,40 @@ export default function Admin() {
                     <td><strong>{o.order_number}</strong></td><td>{o.customer_name}</td>
                     <td>{new Date(o.created_at).toLocaleDateString()}</td><td>{formatPHP(o.total)}</td>
                     <td><code>{o.payment_ref}</code></td>
-                    <td><select className="input" value={o.status} onClick={e=>e.stopPropagation()} onChange={e => handleStatusChange(o.id, e.target.value)} style={{width:130}}>
-                      {ORDER_STATUSES.map(s => <option key={s} value={s}>{s}</option>)}
-                    </select></td>
+                    <td>
+                      <div className="flex gap-sm" style={{ alignItems: 'center' }}>
+                        <span className={`badge badge-${o.status==='Delivered'?'success':o.status==='Cancelled'?'error':o.status==='Shipped'?'info':o.status==='Processing'?'warning':'primary'}`}>
+                          {o.status}
+                        </span>
+                        {o.status !== 'Delivered' && o.status !== 'Cancelled' && (
+                          <>
+                            <button 
+                              className="btn btn-sm btn-secondary" 
+                              style={{ padding: '4px 8px', fontSize: '12px' }}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                const nextMap = { 'Pending': 'Processing', 'Processing': 'Shipped', 'Shipped': 'Delivered' };
+                                handleStatusChange(o.id, nextMap[o.status]);
+                              }}
+                            >
+                              → { { 'Pending': 'Processing', 'Processing': 'Shipped', 'Shipped': 'Delivered' }[o.status] }
+                            </button>
+                            <button 
+                              className="btn btn-sm" 
+                              style={{ padding: '4px 8px', fontSize: '12px', backgroundColor: '#fee2e2', color: '#b91c1c', border: '1px solid #f87171' }}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                if (confirm('Are you sure you want to cancel this order?')) {
+                                  handleStatusChange(o.id, 'Cancelled');
+                                }
+                              }}
+                            >
+                              Cancel
+                            </button>
+                          </>
+                        )}
+                      </div>
+                    </td>
                     <td><ChevronDown size={16} style={{transform:expandedOrder===o.id?'rotate(180deg)':'none',transition:'0.2s'}} /></td>
                   </tr>
                   {expandedOrder === o.id && orderDetail && (

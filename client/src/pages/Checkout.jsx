@@ -111,22 +111,28 @@ export default function Checkout() {
                     <Smartphone size={32} className="gcash-icon" />
                     <div>
                       <h4>Pay via GCash</h4>
-                      <p>Send the exact amount to the number below:</p>
+                      <p>Send the exact amount to the number below or scan the QR Code:</p>
                     </div>
                   </div>
-                  <div className="gcash-details">
-                    <div className="gcash-row"><span>GCash Number:</span><strong>0917-TILE-MATCH</strong></div>
-                    <div className="gcash-row"><span>Amount to Pay:</span><strong className="gcash-amount">{formatPHP(total)}</strong></div>
-                    <div className="gcash-row" style={{ flexDirection: 'column', alignItems: 'flex-start', marginTop: 12 }}>
-                      <span style={{ marginBottom: 8, fontWeight: 500 }}>Reference No *</span>
-                      <input 
-                        className="input" 
-                        placeholder="Enter the 13-digit reference number" 
-                        value={gcashRef} 
-                        onChange={e => setGcashRef(e.target.value)} 
-                        required 
-                        style={{ width: '100%', maxWidth: 300 }}
-                      />
+                  <div className="gcash-details" style={{ display: 'flex', gap: '24px', alignItems: 'flex-start', flexWrap: 'wrap' }}>
+                    <div style={{ flex: 1, minWidth: '250px' }}>
+                      <div className="gcash-row"><span>GCash Number:</span><strong>0917-TILE-MATCH</strong></div>
+                      <div className="gcash-row"><span>Amount to Pay:</span><strong className="gcash-amount">{formatPHP(total)}</strong></div>
+                      <div className="gcash-row" style={{ flexDirection: 'column', alignItems: 'flex-start', marginTop: 12 }}>
+                        <span style={{ marginBottom: 8, fontWeight: 500 }}>Reference No *</span>
+                        <input 
+                          className="input" 
+                          placeholder="Enter the 13-digit reference number" 
+                          value={gcashRef} 
+                          onChange={e => setGcashRef(e.target.value)} 
+                          required 
+                          style={{ width: '100%', maxWidth: 300 }}
+                        />
+                      </div>
+                    </div>
+                    <div style={{ flex: '0 0 auto', textAlign: 'center', backgroundColor: '#fff', padding: '12px', borderRadius: '12px', border: '1px solid #eee' }}>
+                      <img src="/gcash-qr.png" alt="GCash QR Code" style={{ width: '160px', height: '160px', display: 'block', margin: '0 auto' }} />
+                      <div style={{ fontSize: '12px', marginTop: '8px', fontWeight: 500, color: '#0052cc' }}>Scan to Pay</div>
                     </div>
                   </div>
                   <p className="gcash-instruction">After sending payment via GCash, click "Confirm Order" below.</p>

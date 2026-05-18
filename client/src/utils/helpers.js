@@ -12,6 +12,6 @@ export const getStockBadge = (stockQty, threshold = 10) => {
   return { label: 'In Stock', className: 'badge-success' };
 };
 
-export const ORDER_STATUSES = ['Pending', 'Processing', 'Shipped', 'Delivered'];
+export const ORDER_STATUSES = ['Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled'];
 
 export const getStatusIndex = (status) => ORDER_STATUSES.indexOf(status);
