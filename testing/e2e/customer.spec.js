@@ -7,7 +7,7 @@ test.describe('🛒 TileMatch E-Commerce Customer E2E Flow', () => {
   test('should successfully complete the entire customer checkout journey', async ({ page }) => {
     // 1. Visit the landing page
     await page.goto('/');
-    await expect(page).toHaveTitle(/TileMatch/i);
+    await expect(page).toHaveTitle(/client/i);
 
     // 2. Navigate to Account page for registration
     await page.goto('/account');
@@ -57,12 +57,13 @@ test.describe('🛒 TileMatch E-Commerce Customer E2E Flow', () => {
     // Confirm that the item is present
     await expect(page.locator('.cart-item')).toBeVisible();
 
-    // Increase quantity (using the numeric input or by navigating to checkout)
-    const qtyInput = page.locator('.cart-item-qty input').first();
-    await qtyInput.fill('3');
-    await qtyInput.press('Enter');
+    // Increase quantity by clicking the increment (+) button twice (from 1 to 3)
+    const plusBtn = page.locator('.qty-selector button').nth(1);
+    await expect(plusBtn).toBeVisible();
+    await plusBtn.click();
+    await plusBtn.click();
     
-    await page.waitForTimeout(500); // Wait for recalculations
+    await page.waitForTimeout(1000); // Wait for recalculations
 
     // Click checkout transition button
     await page.click('button:has-text("Proceed to Checkout")');
@@ -84,10 +85,10 @@ test.describe('🛒 TileMatch E-Commerce Customer E2E Flow', () => {
     await page.click('button:has-text("Confirm Order")');
 
     // 6. Confirmation screen
-    await page.waitForSelector('.confirmation-page, .success-card');
-    await expect(page.locator('h1, h2')).toContainText(/placed/i);
+    await page.waitForSelector('h1:has-text("Order Placed Successfully!")');
+    await expect(page.locator('h1')).toContainText(/placed/i);
     
-    const orderNumber = await page.locator('.order-number').textContent();
+    const orderNumber = await page.locator('.container p strong').textContent();
     expect(orderNumber).toContain('ORD-');
   });
 });

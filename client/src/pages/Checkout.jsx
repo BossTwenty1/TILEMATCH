@@ -33,6 +33,7 @@ export default function Checkout() {
     postalCode: user?.address?.postalCode || ''
   });
   const [errors, setErrors] = useState({});
+  const [orderCompleted, setOrderCompleted] = useState(false);
 
   const validateStep1 = () => {
     const e = {};
@@ -60,6 +61,7 @@ export default function Checkout() {
         barangay: shipping.barangay, street: shipping.street,
         postalCode: shipping.postalCode, paymentRef: gcashRef
       });
+      setOrderCompleted(true);
       clearCart();
       addToast('Order placed successfully!');
       navigate(`/confirmation/${data.order.orderNumber}`);
@@ -68,7 +70,7 @@ export default function Checkout() {
     } finally { setSubmitting(false); }
   };
 
-  if (items.length === 0) { navigate('/cart'); return null; }
+  if (items.length === 0 && !orderCompleted) { navigate('/cart'); return null; }
 
   return (
     <div className="checkout-page page">

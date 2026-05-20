@@ -43,7 +43,21 @@ router.post('/register', async (req, res) => {
     res.status(201).json({
       message: 'Registration successful.',
       token,
-      user: { id: result.insertId, email, firstName, lastName, role: 'customer' }
+      user: {
+        id: result.insertId,
+        email,
+        firstName,
+        lastName,
+        phone: phone || null,
+        role: 'customer',
+        address: {
+          municipality: municipality || null,
+          city: city || null,
+          barangay: barangay || null,
+          street: street || null,
+          postalCode: postalCode || null
+        }
+      }
     });
   } catch (err) {
     console.error('Register error:', err);
