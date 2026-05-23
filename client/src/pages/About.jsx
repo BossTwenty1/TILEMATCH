@@ -92,7 +92,7 @@ export default function About() {
 
           <div className="about-team-panel">
             <div className="about-team-image">
-              <img src="https://images.unsplash.com/photo-1556761175-b413da4baf72?auto=format&fit=crop&w=1200&q=80" alt="TileMatch service team reviewing project samples" />
+              <img src="/group-pic.png" alt="TileMatch service team reviewing project samples" />
             </div>
             <div className="about-team-copy">
               <Building2 size={28} />
