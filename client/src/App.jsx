@@ -11,6 +11,8 @@ import Cart from './pages/Cart';
 import Checkout from './pages/Checkout';
 import Account from './pages/Account';
 import Tracking from './pages/Tracking';
+import Contact from './pages/Contact';
+import About from './pages/About';
 import Confirmation from './pages/Confirmation';
 import Admin from './pages/Admin';
 import ResetPassword from './pages/ResetPassword';
@@ -30,6 +32,8 @@ export default function App() {
               <Route path="/checkout" element={<Checkout />} />
               <Route path="/account" element={<Account />} />
               <Route path="/tracking" element={<Tracking />} />
+              <Route path="/contact" element={<Contact />} />
+              <Route path="/about" element={<About />} />
               <Route path="/confirmation/:orderNumber" element={<Confirmation />} />
               <Route path="/admin" element={<Admin />} />
               <Route path="/reset-password/:token" element={<ResetPassword />} />

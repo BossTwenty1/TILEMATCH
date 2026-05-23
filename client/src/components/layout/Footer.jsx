@@ -14,16 +14,20 @@ export default function Footer() {
           <div className="footer-links">
             <h4>Quick Links</h4>
             <Link to="/">Home</Link>
+            <Link to="/about">About TileMatch</Link>
             <Link to="/shop">Shop All Tiles</Link>
             <Link to="/shop?category=Ceramic">Ceramic</Link>
             <Link to="/shop?category=Porcelain">Porcelain</Link>
             <Link to="/shop?category=Glass">Glass</Link>
+            <Link to="/contact">Contact</Link>
           </div>
           <div className="footer-links">
             <h4>Customer Service</h4>
             <Link to="/tracking">Track Order</Link>
             <Link to="/account">My Account</Link>
             <Link to="/cart">Shopping Cart</Link>
+            <Link to="/about">Our Story</Link>
+            <Link to="/contact">Contact Support</Link>
           </div>
           <div className="footer-contact">
             <h4>Contact Us</h4>

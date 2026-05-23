@@ -4,8 +4,8 @@ import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
 import { ordersAPI } from '../services/api';
-import { formatPHP, generateGCashRef } from '../utils/helpers';
-import { ArrowLeft, ArrowRight, CheckCircle, Smartphone } from 'lucide-react';
+import { formatPHP } from '../utils/helpers';
+import { ArrowLeft, ArrowRight, CheckCircle, Gift, Smartphone } from 'lucide-react';
 import './Checkout.css';
 
 const Field = React.memo(({ label, name, type = 'text', shipping, setShipping, errors }) => (
@@ -142,9 +142,9 @@ export default function Checkout() {
 
                 <h4 style={{marginTop:24}}>Order Summary</h4>
                 {items.map(item => (
-                  <div key={item.product_id} className="checkout-item">
-                    <span>{item.name} × {item.quantity}</span>
-                    <span>{formatPHP(item.price * item.quantity)}</span>
+                  <div key={`${item.is_freebie ? 'freebie' : 'item'}-${item.parent_product_id || item.product_id}-${item.product_id}`} className={`checkout-item ${item.is_freebie ? 'checkout-freebie' : ''}`}>
+                    <span>{item.is_freebie && <Gift size={14} />} {item.is_freebie ? `[Bonus] ${item.name}` : item.name} x {item.quantity}</span>
+                    <span>{item.is_freebie ? 'FREE' : formatPHP(item.line_total ?? item.price * item.quantity)}</span>
                   </div>
                 ))}
 

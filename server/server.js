@@ -19,6 +19,7 @@ app.use('/api/products', require('./routes/products'));
 app.use('/api/cart', require('./routes/cart'));
 app.use('/api/orders', require('./routes/orders'));
 app.use('/api/admin', require('./routes/admin'));
+app.use('/api/contact', require('./routes/contact'));
 // Health check
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', service: 'TileMatch API', timestamp: new Date().toISOString() });
@@ -63,6 +64,7 @@ app.listen(PORT, () => {
   console.log(`   GET    /api/admin/analytics/categories`);
   console.log(`   GET    /api/admin/analytics/bestsellers`);
   console.log(`   GET    /api/admin/analytics/export-csv`);
+  console.log(`   POST   /api/contact`);
 });
 
 module.exports = app;

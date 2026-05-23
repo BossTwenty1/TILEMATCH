@@ -3,10 +3,35 @@ const router = express.Router();
 const db = require('../config/db');
 const { authenticate, authorizeAdmin } = require('../middleware/auth');
 const { sendStatusUpdate } = require('../services/emailService');
+const {
+  ensurePromotionSchema,
+  promotionJoins,
+  promotionSelect,
+  sanitizePromotion,
+  savePromotion
+} = require('../services/promotionService');
 
 // All admin routes require authentication + admin role
 router.use(authenticate);
 router.use(authorizeAdmin);
+
+const validateFreebiePromotion = async (productId, promotion) => {
+  if (promotion.promoType !== 'freebie') return null;
+
+  if (productId && Number(productId) === Number(promotion.freebieProductId)) {
+    return 'A product cannot use itself as its freebie.';
+  }
+
+  const [freebies] = await db.execute(
+    `SELECT p.id
+     FROM products p
+     JOIN inventory i ON p.id = i.product_id
+     WHERE p.id = ? AND p.is_active = TRUE AND i.stock_qty > 0 AND i.stock_qty <= i.low_stock_threshold`,
+    [promotion.freebieProductId]
+  );
+
+  return freebies.length > 0 ? null : 'Freebie must be an active low-stock tile.';
+};
 
 // ============================================================
 // DASHBOARD (FR-74, FR-75)
@@ -46,8 +71,14 @@ router.get('/dashboard', async (req, res) => {
 // FR-53: Get all products (admin view includes inactive)
 router.get('/products', async (req, res) => {
   try {
+    await ensurePromotionSchema(db);
     const { search } = req.query;
-    let sql = `SELECT p.*, i.stock_qty, i.low_stock_threshold FROM products p LEFT JOIN inventory i ON p.id = i.product_id`;
+    let sql = `
+      SELECT p.*, i.stock_qty, i.low_stock_threshold, ${promotionSelect}
+      FROM products p
+      LEFT JOIN inventory i ON p.id = i.product_id
+      ${promotionJoins}
+    `;
     const params = [];
 
     if (search) {
@@ -64,10 +95,32 @@ router.get('/products', async (req, res) => {
   }
 });
 
+router.get('/promotions/freebies', async (req, res) => {
+  try {
+    await ensurePromotionSchema(db);
+    const [items] = await db.execute(`
+      SELECT p.id, p.name, p.category, p.price, p.image_url, i.stock_qty
+      FROM products p
+      JOIN inventory i ON p.id = i.product_id
+      WHERE p.is_active = TRUE AND i.stock_qty > 0 AND i.stock_qty <= i.low_stock_threshold
+      ORDER BY i.stock_qty ASC, p.name ASC
+    `);
+    res.json(items);
+  } catch (err) {
+    console.error('Freebie options error:', err);
+    res.status(500).json({ error: 'Server error.' });
+  }
+});
+
 // FR-54, FR-56: Add new product
 router.post('/products', async (req, res) => {
   try {
+    await ensurePromotionSchema(db);
     const { name, description, category, material, color, size, roomApplication, price, stock, imageUrl, isActive } = req.body;
+    const promotion = sanitizePromotion(req.body);
+    if (promotion.error) return res.status(400).json({ error: promotion.error });
+    const promotionValidationError = await validateFreebiePromotion(null, promotion);
+    if (promotionValidationError) return res.status(400).json({ error: promotionValidationError });
 
     // FR-56: Validate required
     if (!name || !category || !material || !color || !size || !price) {
@@ -82,6 +135,7 @@ router.post('/products', async (req, res) => {
 
     // Create inventory record
     await db.execute('INSERT INTO inventory (product_id, stock_qty) VALUES (?, ?)', [result.insertId, stock || 0]);
+    await savePromotion(db, result.insertId, promotion);
 
     res.status(201).json({ message: 'Product added.', productId: result.insertId });
   } catch (err) {
@@ -93,7 +147,12 @@ router.post('/products', async (req, res) => {
 // FR-57, FR-60: Edit product
 router.put('/products/:id', async (req, res) => {
   try {
+    await ensurePromotionSchema(db);
     const { name, description, category, material, color, size, roomApplication, price, stock, imageUrl, isActive } = req.body;
+    const promotion = sanitizePromotion(req.body);
+    if (promotion.error) return res.status(400).json({ error: promotion.error });
+    const promotionValidationError = await validateFreebiePromotion(req.params.id, promotion);
+    if (promotionValidationError) return res.status(400).json({ error: promotionValidationError });
 
     await db.execute(
       `UPDATE products SET name=?, description=?, category=?, material=?, color=?, size=?, room_application=?, price=?, image_url=?, is_active=? WHERE id=?`,
@@ -103,6 +162,7 @@ router.put('/products/:id', async (req, res) => {
     if (stock !== undefined) {
       await db.execute('UPDATE inventory SET stock_qty = ? WHERE product_id = ?', [stock, req.params.id]);
     }
+    await savePromotion(db, req.params.id, promotion);
     res.json({ message: 'Product updated.' });
   } catch (err) {
     console.error('Update product error:', err);

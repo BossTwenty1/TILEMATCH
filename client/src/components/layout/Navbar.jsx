@@ -6,7 +6,7 @@ import { useState, useEffect } from 'react';
 import './Navbar.css';
 
 export default function Navbar() {
-  const { user, isAdmin, isLoggedIn, logout } = useAuth();
+  const { isAdmin, isLoggedIn } = useAuth();
   const { itemCount } = useCart();
   const [menuOpen, setMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -70,7 +70,9 @@ export default function Navbar() {
         <div className="navbar-links">
           <Link to="/">Home</Link>
           <Link to="/shop">Shop</Link>
+          <Link to="/about">About</Link>
           <Link to="/tracking">Track Order</Link>
+          <Link to="/contact">Contact</Link>
           {isLoggedIn ? (
             <>
               {isAdmin && <Link to="/admin" className="nav-admin">Admin</Link>}
@@ -103,7 +105,9 @@ export default function Navbar() {
         <div className="drawer-content">
           <Link to="/" onClick={() => setMenuOpen(false)}>Home</Link>
           <Link to="/shop" onClick={() => setMenuOpen(false)}>Shop</Link>
+          <Link to="/about" onClick={() => setMenuOpen(false)}>About</Link>
           <Link to="/tracking" onClick={() => setMenuOpen(false)}>Track Order</Link>
+          <Link to="/contact" onClick={() => setMenuOpen(false)}>Contact</Link>
           {isLoggedIn ? (
             <>
               {isAdmin && <Link to="/admin" onClick={() => setMenuOpen(false)}>Admin Dashboard</Link>}

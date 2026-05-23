@@ -48,6 +48,30 @@
     background: var(--error);
 }
 
+.promo-ribbon {
+    position: absolute;
+    left: 10px;
+    top: 10px;
+    display: inline-flex;
+    align-items: center;
+    max-width: calc(100% - 36px);
+    padding: 5px 9px;
+    border-radius: var(--radius-sm);
+    color: white;
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 1.2;
+    box-shadow: var(--shadow-sm);
+}
+
+.promo-ribbon.bulk {
+    background: var(--accent);
+}
+
+.promo-ribbon.gift {
+    background: var(--primary);
+}
+
 .product-card-body {
     padding: 14px 16px;
 }

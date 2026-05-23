@@ -104,6 +104,21 @@ CREATE TABLE inventory (
 ) ENGINE=InnoDB;
 
 -- ============================================================
+-- 6A. PRODUCT PROMOTIONS
+-- ============================================================
+CREATE TABLE product_promotions (
+  product_id         INT NOT NULL PRIMARY KEY,
+  promo_type         ENUM('none', 'volume', 'freebie') NOT NULL DEFAULT 'none',
+  min_quantity       INT NULL,
+  discount_percent   DECIMAL(5,2) NULL,
+  freebie_product_id INT NULL,
+  created_at         TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at         TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE,
+  FOREIGN KEY (freebie_product_id) REFERENCES products(id) ON DELETE SET NULL
+) ENGINE=InnoDB;
+
+-- ============================================================
 -- 7. CART (FR-18 through FR-27, persistent per FR-26)
 -- ============================================================
 CREATE TABLE cart (

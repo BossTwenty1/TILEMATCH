@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const db = require('../config/db');
 const { authenticate } = require('../middleware/auth');
+const { buildCartPricing, ensurePromotionSchema, promotionJoins, promotionSelect } = require('../services/promotionService');
 
 // All cart routes require authentication
 router.use(authenticate);
@@ -9,6 +10,7 @@ router.use(authenticate);
 // FR-21: Get cart contents
 router.get('/', async (req, res) => {
   try {
+    await ensurePromotionSchema(db);
     // Get or create cart
     let [carts] = await db.execute('SELECT id FROM cart WHERE customer_id = ?', [req.user.id]);
     if (carts.length === 0) {
@@ -21,27 +23,21 @@ router.get('/', async (req, res) => {
     const [items] = await db.execute(
       `SELECT ci.id, ci.product_id, ci.quantity,
               p.name, p.price, p.image_url, p.category,
-              i.stock_qty
+              i.stock_qty,
+              ${promotionSelect}
        FROM cart_items ci
        JOIN products p ON ci.product_id = p.id
        LEFT JOIN inventory i ON p.id = i.product_id
+       ${promotionJoins}
        WHERE ci.cart_id = ?`,
       [cartId]
     );
 
     // FR-22: Calculate totals
-    const subtotal = items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-    const shippingFee = subtotal >= 2000 ? 0 : 200;
-    const tax = Math.round(subtotal * 0.12 * 100) / 100;
-    const total = Math.round((subtotal + shippingFee + tax) * 100) / 100;
+    const pricing = buildCartPricing(items);
 
     res.json({
-      items,
-      itemCount: items.reduce((sum, item) => sum + item.quantity, 0),
-      subtotal,
-      shippingFee,
-      tax,
-      total
+      ...pricing
     });
   } catch (err) {
     console.error('Get cart error:', err);

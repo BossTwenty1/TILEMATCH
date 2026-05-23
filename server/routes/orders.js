@@ -3,6 +3,7 @@ const router = express.Router();
 const db = require('../config/db');
 const { authenticate } = require('../middleware/auth');
 const { sendOrderConfirmation } = require('../services/emailService');
+const { buildCartPricing, ensurePromotionSchema, promotionJoins, promotionSelect } = require('../services/promotionService');
 
 // All order routes require authentication
 router.use(authenticate);
@@ -11,29 +12,39 @@ router.use(authenticate);
 router.post('/place', async (req, res) => {
   const conn = await db.getConnection();
   try {
+    await ensurePromotionSchema(conn);
     await conn.beginTransaction();
 
     const { municipality, city, barangay, street, postalCode, paymentRef } = req.body;
 
     // FR-30: Validate address
     if (!municipality || !city || !barangay || !street || !postalCode) {
+      await conn.rollback();
       return res.status(400).json({ error: 'All address fields are required.' });
     }
 
     // Get cart items
     const [carts] = await conn.execute('SELECT id FROM cart WHERE customer_id = ?', [req.user.id]);
-    if (carts.length === 0) return res.status(400).json({ error: 'Cart not found.' });
+    if (carts.length === 0) {
+      await conn.rollback();
+      return res.status(400).json({ error: 'Cart not found.' });
+    }
 
     const [cartItems] = await conn.execute(
       `SELECT ci.product_id, ci.quantity, p.name, p.price, p.category, i.stock_qty
+              , ${promotionSelect}
        FROM cart_items ci
        JOIN products p ON ci.product_id = p.id
        LEFT JOIN inventory i ON p.id = i.product_id
+       ${promotionJoins}
        WHERE ci.cart_id = ?`,
       [carts[0].id]
     );
 
-    if (cartItems.length === 0) return res.status(400).json({ error: 'Cart is empty.' });
+    if (cartItems.length === 0) {
+      await conn.rollback();
+      return res.status(400).json({ error: 'Cart is empty.' });
+    }
 
     // FR-67: Verify stock for all items
     for (const item of cartItems) {
@@ -44,10 +55,9 @@ router.post('/place', async (req, res) => {
     }
 
     // Calculate totals
-    const subtotal = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-    const tax = Math.round(subtotal * 0.12 * 100) / 100;
-    const shippingFee = subtotal >= 2000 ? 0 : 200;
-    const total = Math.round((subtotal + tax + shippingFee) * 100) / 100;
+    const pricing = buildCartPricing(cartItems);
+    const orderLines = pricing.items;
+    const { subtotal, tax, shippingFee, total } = pricing;
 
     // FR-33: Generate unique order number
     const orderNumber = `ORD-2025-${String(Date.now()).slice(-4).padStart(4, '0')}`;
@@ -74,20 +84,20 @@ router.post('/place', async (req, res) => {
     const orderId = orderResult.insertId;
 
     // Insert order items
-    for (const item of cartItems) {
-      const lineTotal = item.price * item.quantity;
+    for (const item of orderLines) {
+      const lineTotal = item.line_total;
       await conn.execute(
         'INSERT INTO order_items (order_id, product_id, product_name, quantity, unit_price, line_total) VALUES (?, ?, ?, ?, ?, ?)',
-        [orderId, item.product_id, item.name, item.quantity, item.price, lineTotal]
+        [orderId, item.product_id, item.is_freebie ? `[Bonus] ${item.name}` : item.name, item.quantity, item.effective_price, lineTotal]
       );
 
       // FR-65: Decrease stock
       await conn.execute('UPDATE inventory SET stock_qty = stock_qty - ? WHERE product_id = ?', [item.quantity, item.product_id]);
 
-      // Update sold count
-      await conn.execute('UPDATE products SET sold_count = sold_count + ? WHERE id = ?', [item.quantity, item.product_id]);
+      if (item.is_freebie) continue;
 
-      // Insert sales record
+      // Update sold count and insert sales record for paid items.
+      await conn.execute('UPDATE products SET sold_count = sold_count + ? WHERE id = ?', [item.quantity, item.product_id]);
       await conn.execute(
         'INSERT INTO sales (order_id, product_id, category, quantity_sold, revenue, sale_date) VALUES (?, ?, ?, ?, ?, CURDATE())',
         [orderId, item.product_id, item.category, item.quantity, lineTotal]
@@ -109,7 +119,7 @@ router.post('/place', async (req, res) => {
     // FR-48: Send confirmation email (async, don't block response)
     const orderData = {
       order_number: orderNumber, customer_name: customerName, customer_email: customerEmail,
-      payment_ref: gcashRef, items: cartItems.map(i => ({ product_name: i.name, quantity: i.quantity, line_total: i.price * i.quantity })),
+      payment_ref: gcashRef, items: orderLines.map(i => ({ product_name: i.is_freebie ? `[Bonus] ${i.name}` : i.name, quantity: i.quantity, line_total: i.line_total })),
       subtotal, tax, shipping_fee: shippingFee, total, estimated_delivery: estimatedDelivery.toDateString()
     };
     sendOrderConfirmation(orderData).catch(err => console.error('Email error:', err));

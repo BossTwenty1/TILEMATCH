@@ -1,14 +1,17 @@
 const express = require('express');
 const router = express.Router();
 const db = require('../config/db');
+const { ensurePromotionSchema, promotionJoins, promotionSelect } = require('../services/promotionService');
 
 // FR-10: Display all products | FR-11: By category | FR-12: Search | FR-13: Filters | FR-14: Sort
 router.get('/', async (req, res) => {
   try {
+    await ensurePromotionSchema(db);
     const { search, category, material, color, size, room, minPrice, maxPrice, sort, page = 1, limit = 20 } = req.query;
 
     let sql = `
       SELECT p.*, i.stock_qty, i.low_stock_threshold,
+        ${promotionSelect},
         CASE
           WHEN i.stock_qty = 0 THEN 'Out of Stock'
           WHEN i.stock_qty < i.low_stock_threshold THEN 'Low Stock'
@@ -16,6 +19,7 @@ router.get('/', async (req, res) => {
         END AS stock_status
       FROM products p
       LEFT JOIN inventory i ON p.id = i.product_id
+      ${promotionJoins}
       WHERE p.is_active = TRUE
     `;
     const params = [];
@@ -150,10 +154,15 @@ router.get('/', async (req, res) => {
 // FR-15, FR-16: Product detail with images and specs
 router.get('/:id', async (req, res) => {
   try {
+    await ensurePromotionSchema(db);
     const [products] = await db.execute(
       `SELECT p.*, i.stock_qty, i.low_stock_threshold,
+        ${promotionSelect},
         CASE WHEN i.stock_qty = 0 THEN 'Out of Stock' WHEN i.stock_qty < i.low_stock_threshold THEN 'Low Stock' ELSE 'In Stock' END AS stock_status
-       FROM products p LEFT JOIN inventory i ON p.id = i.product_id WHERE p.id = ?`,
+       FROM products p
+       LEFT JOIN inventory i ON p.id = i.product_id
+       ${promotionJoins}
+       WHERE p.id = ?`,
       [req.params.id]
     );
     if (products.length === 0) return res.status(404).json({ error: 'Product not found.' });

@@ -18,6 +18,11 @@
 .order-expand { padding: 0 !important; }
 .order-expand-inner { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; padding: 16px 20px; background: #faf8f5; }
 .order-expand-inner h4 { font-family: var(--font-body); font-size: 13px; text-transform: uppercase; color: var(--text-secondary); margin-bottom: 8px; }
+.promo-admin-section { margin-top: 18px; padding: 18px; border: 1px solid var(--border-light); border-radius: var(--radius-md); background: #fffdfb; }
+.promo-admin-heading { margin-bottom: 14px; }
+.promo-admin-heading h4 { color: var(--primary); margin-bottom: 2px; }
+.promo-admin-heading p, .promo-admin-note { color: var(--text-muted); font-size: 13px; line-height: 1.5; }
+.promo-admin-note { margin-top: 4px; display: block; }
 @media (max-width: 768px) {
   .stats-grid { grid-template-columns: repeat(2, 1fr); }
   .analytics-grid { grid-template-columns: 1fr; }

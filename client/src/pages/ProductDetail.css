@@ -3,6 +3,9 @@
 .pd-main-image img { width: 100%; aspect-ratio: 1; object-fit: cover; transition: transform 0.3s; }
 .pd-main-image img.zoomed { transform: scale(2); cursor: zoom-out; }
 .zoom-hint { position: absolute; bottom: 12px; right: 12px; background: rgba(0,0,0,0.6); color: white; padding: 4px 10px; border-radius: var(--radius); font-size: 12px; display: flex; align-items: center; gap: 4px; }
+.pd-promo-badge { position: absolute; top: 14px; left: 14px; color: white; padding: 7px 12px; border-radius: var(--radius); font-size: 12px; font-weight: 700; box-shadow: var(--shadow-sm); }
+.pd-promo-badge.bulk { background: var(--accent); }
+.pd-promo-badge.gift { background: var(--primary); }
 .pd-thumbs { display: flex; gap: 10px; margin-top: 12px; }
 .pd-thumb { width: 70px; height: 70px; border-radius: var(--radius); overflow: hidden; border: 2px solid transparent; cursor: pointer; padding: 0; }
 .pd-thumb.active { border-color: var(--accent); }
@@ -12,6 +15,12 @@
 .pd-price { font-size: 1.75rem; font-weight: 700; color: var(--primary); }
 .pd-price span { font-size: 14px; font-weight: 400; color: var(--text-secondary); }
 .pd-desc { color: var(--text-secondary); font-size: 15px; line-height: 1.7; }
+.pd-promo-callout { display: flex; align-items: flex-start; gap: 12px; padding: 16px; border-radius: var(--radius-md); border: 1px solid var(--border-light); background: white; box-shadow: var(--shadow-sm); }
+.pd-promo-callout svg { flex-shrink: 0; color: var(--accent); margin-top: 2px; }
+.pd-promo-callout.gift svg { color: var(--primary); }
+.pd-promo-callout strong { display: block; color: var(--primary); margin-bottom: 4px; }
+.pd-promo-callout p { color: var(--text-secondary); font-size: 14px; line-height: 1.5; }
+.pd-freebie-preview { width: 72px; height: 72px; object-fit: cover; border-radius: var(--radius); margin-top: 10px; border: 1px solid var(--border-light); }
 .pd-specs { margin-top: 8px; }
 .pd-specs h4 { font-family: var(--font-body); margin-bottom: 10px; }
 .pd-specs table { width: 100%; }
@@ -22,4 +31,5 @@
 .qty-selector button { padding: 10px 14px; border: none; background: var(--bg); cursor: pointer; }
 .qty-selector button:hover { background: var(--border); }
 .qty-selector span { padding: 10px 20px; font-weight: 600; min-width: 50px; text-align: center; }
+.pd-qty-hint { flex-basis: 100%; color: var(--accent-dark); background: var(--warning-bg); padding: 9px 12px; border-radius: var(--radius); font-size: 13px; }
 @media (max-width: 768px) { .pd-layout { grid-template-columns: 1fr; gap: 24px; } .pd-info h1 { font-size: 1.4rem; } }

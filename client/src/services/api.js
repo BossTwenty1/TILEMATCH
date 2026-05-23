@@ -61,11 +61,17 @@ export const ordersAPI = {
   track: (orderNumber) => api.get(`/orders/track/${orderNumber}`)
 };
 
+// === CONTACT ===
+export const contactAPI = {
+  send: (data) => api.post('/contact', data)
+};
+
 // === ADMIN ===
 export const adminAPI = {
   dashboard: () => api.get('/admin/dashboard'),
   // Products
   getProducts: (search) => api.get('/admin/products', { params: { search } }),
+  getLowStockFreebies: () => api.get('/admin/promotions/freebies'),
   addProduct: (data) => api.post('/admin/products', data),
   updateProduct: (id, data) => api.put(`/admin/products/${id}`, data),
   deleteProduct: (id) => api.delete(`/admin/products/${id}`),

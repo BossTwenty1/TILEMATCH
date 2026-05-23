@@ -2,12 +2,12 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import { formatPHP } from '../utils/helpers';
-import { Minus, Plus, Trash2, ShoppingBag, ArrowRight } from 'lucide-react';
+import { Gift, Minus, Plus, Trash2, ShoppingBag, ArrowRight, Lock } from 'lucide-react';
 import { useToast } from '../context/ToastContext';
 import './Cart.css';
 
 export default function Cart() {
-  const { items, updateQty, removeItem, subtotal, shippingFee, tax, total, loading } = useCart();
+  const { items, updateQty, removeItem, subtotal, shippingFee, tax, total, savings } = useCart();
   const { isLoggedIn } = useAuth();
   const { addToast } = useToast();
   const navigate = useNavigate();
@@ -55,21 +55,35 @@ export default function Cart() {
         <div className="cart-layout">
           <div className="cart-items">
             {items.map(item => (
-              <div key={item.product_id} className="cart-item card">
+              <div key={`${item.is_freebie ? 'freebie' : 'item'}-${item.parent_product_id || item.product_id}-${item.product_id}`} className={`cart-item card ${item.is_freebie ? 'cart-freebie' : ''}`}>
                 <Link to={`/product/${item.product_id}`}><img src={item.image_url} alt={item.name} /></Link>
                 <div className="cart-item-info">
+                  {item.is_freebie && <span className="cart-bonus-label"><Gift size={14} /> Bonus item</span>}
                   <Link to={`/product/${item.product_id}`}><h4>{item.name}</h4></Link>
                   <span className="product-category">{item.category}</span>
-                  <span className="cart-item-price">{formatPHP(item.price)} each</span>
+                  {item.promo_message && <span className="cart-promo-message">{item.promo_message}</span>}
+                  <span className="cart-item-price">
+                    {item.promo_applied && !item.is_freebie && item.effective_price !== item.price ? (
+                      <><s>{formatPHP(item.price)}</s> {formatPHP(item.effective_price)} each</>
+                    ) : item.is_freebie ? (
+                      <><s>{formatPHP(item.price)}</s> FREE</>
+                    ) : (
+                      <>{formatPHP(item.price)} each</>
+                    )}
+                  </span>
                 </div>
                 <div className="cart-item-controls">
-                  <div className="qty-selector">
-                    <button onClick={() => handleQtyChange(item.product_id, Math.max(1, item.quantity - 1))}><Minus size={14} /></button>
-                    <span>{item.quantity}</span>
-                    <button onClick={() => handleQtyChange(item.product_id, item.quantity + 1)}><Plus size={14} /></button>
-                  </div>
-                  <span className="cart-item-total">{formatPHP(item.price * item.quantity)}</span>
-                  <button className="btn btn-ghost" onClick={() => handleRemove(item.product_id)}><Trash2 size={16} /></button>
+                  {item.is_freebie ? (
+                    <span className="cart-locked"><Lock size={14} /> Locked</span>
+                  ) : (
+                    <div className="qty-selector">
+                      <button onClick={() => handleQtyChange(item.product_id, Math.max(1, item.quantity - 1))}><Minus size={14} /></button>
+                      <span>{item.quantity}</span>
+                      <button onClick={() => handleQtyChange(item.product_id, item.quantity + 1)}><Plus size={14} /></button>
+                    </div>
+                  )}
+                  <span className="cart-item-total">{item.is_freebie ? 'FREE' : formatPHP(item.line_total ?? item.price * item.quantity)}</span>
+                  {!item.is_freebie && <button className="btn btn-ghost" onClick={() => handleRemove(item.product_id)}><Trash2 size={16} /></button>}
                 </div>
               </div>
             ))}
@@ -78,6 +92,7 @@ export default function Cart() {
           <div className="cart-summary card card-body">
             <h3>Order Summary</h3>
             <div className="summary-row"><span>Subtotal</span><span>{formatPHP(subtotal)}</span></div>
+            {savings > 0 && <div className="summary-row promo-savings"><span>Promo Savings</span><span>-{formatPHP(savings)}</span></div>}
             <div className="summary-row"><span>Shipping</span><span>{shippingFee === 0 ? <em style={{color:'var(--success)'}}>Free!</em> : formatPHP(shippingFee)}</span></div>
             <div className="summary-row"><span>VAT (12%)</span><span>{formatPHP(tax)}</span></div>
             <hr />

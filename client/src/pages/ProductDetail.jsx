@@ -5,7 +5,7 @@ import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
 import { formatPHP, getStockBadge } from '../utils/helpers';
-import { ShoppingCart, Minus, Plus, ArrowLeft, ZoomIn } from 'lucide-react';
+import { ShoppingCart, Minus, Plus, ArrowLeft, ZoomIn, Gift, Tag } from 'lucide-react';
 import './ProductDetail.css';
 
 export default function ProductDetail() {
@@ -44,6 +44,13 @@ export default function ProductDetail() {
   const images = product.images || [product.image_url];
   const stock = getStockBadge(product.stock_qty);
   const outOfStock = product.stock_qty === 0;
+  const hasVolumePromo = product.promo_type === 'volume' && product.promo_min_quantity && product.promo_discount_percent;
+  const hasFreebiePromo = product.promo_type === 'freebie' && product.freebie_name;
+  const volumeThreshold = Number(product.promo_min_quantity || 0);
+  const volumeDiscount = Number(product.promo_discount_percent || 0);
+  const promoActiveAtQty = hasVolumePromo && quantity >= volumeThreshold;
+  const discountedUnitPrice = promoActiveAtQty ? Number(product.price) * (1 - volumeDiscount / 100) : Number(product.price);
+  const promoRemainingQty = hasVolumePromo ? Math.max(0, volumeThreshold - quantity) : 0;
 
   return (
     <div className="product-detail page">
@@ -54,6 +61,8 @@ export default function ProductDetail() {
           <div className="pd-gallery">
             <div className="pd-main-image" onClick={() => setZoomed(!zoomed)}>
               <img src={images[selectedImage]} alt={product.name} className={zoomed ? 'zoomed' : ''} />
+              {hasVolumePromo && <span className="pd-promo-badge bulk">Bulk Savings Available</span>}
+              {hasFreebiePromo && <span className="pd-promo-badge gift">Free Gift Included</span>}
               <span className="zoom-hint"><ZoomIn size={16} /> Click to zoom</span>
             </div>
             {images.length > 1 && (
@@ -72,6 +81,27 @@ export default function ProductDetail() {
             <h1>{product.name}</h1>
             <p className="pd-price">{formatPHP(product.price)} <span>per piece</span></p>
             <span className={`badge ${stock.className}`}>{stock.label} {!outOfStock && `(${product.stock_qty} pcs)`}</span>
+
+            {hasVolumePromo && (
+              <div className="pd-promo-callout bulk">
+                <Tag size={20} />
+                <div>
+                  <strong>Buy {volumeThreshold} pieces or more and get {volumeDiscount}% off this item.</strong>
+                  <p>{promoActiveAtQty ? `Bulk discount active. You save ${formatPHP((Number(product.price) - discountedUnitPrice) * quantity)} on this quantity.` : `Add ${promoRemainingQty} more piece${promoRemainingQty === 1 ? '' : 's'} to unlock the discount.`}</p>
+                </div>
+              </div>
+            )}
+
+            {hasFreebiePromo && (
+              <div className="pd-promo-callout gift">
+                <Gift size={20} />
+                <div>
+                  <strong>Free Bonus: 1 piece of {product.freebie_name}</strong>
+                  <p>Included automatically when you add this item to your cart.</p>
+                  {product.freebie_image_url && <img src={product.freebie_image_url} alt={product.freebie_name} className="pd-freebie-preview" />}
+                </div>
+              </div>
+            )}
 
             <p className="pd-desc">{product.description}</p>
 
@@ -99,8 +129,11 @@ export default function ProductDetail() {
                   <button onClick={() => setQuantity(Math.min(product.stock_qty, quantity + 1))}><Plus size={16} /></button>
                 </div>
                 <button className="btn btn-primary btn-lg" onClick={handleAdd}>
-                  <ShoppingCart size={18} /> Add to Cart — {formatPHP(product.price * quantity)}
+                  <ShoppingCart size={18} /> Add to Cart - {formatPHP(discountedUnitPrice * quantity)}
                 </button>
+                {hasVolumePromo && !promoActiveAtQty && (
+                  <p className="pd-qty-hint">Add {promoRemainingQty} more piece{promoRemainingQty === 1 ? '' : 's'} to save {volumeDiscount}%.</p>
+                )}
               </div>
             )}
           </div>

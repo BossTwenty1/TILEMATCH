@@ -5,12 +5,16 @@ import './ProductCard.css';
 
 export default function ProductCard({ product, onAddToCart }) {
   const stockStatus = product.stock_qty === 0 ? 'out' : product.stock_qty < 10 ? 'low' : 'in';
+  const hasVolumePromo = product.promo_type === 'volume';
+  const hasFreebiePromo = product.promo_type === 'freebie' && product.freebie_name;
 
   return (
     <div className="product-card card">
       <Link to={`/product/${product.id}`} className="product-card-img">
         <img src={product.image_url} alt={product.name} loading="lazy" />
         <span className={`stock-dot ${stockStatus}`} />
+        {hasVolumePromo && <span className="promo-ribbon bulk">Bulk Savings</span>}
+        {hasFreebiePromo && <span className="promo-ribbon gift">Free Gift</span>}
       </Link>
       <div className="product-card-body">
         <span className="product-category">{product.category}</span>

@@ -5,7 +5,6 @@ import { adminAPI } from '../services/api';
 import { formatPHP, ORDER_STATUSES } from '../utils/helpers';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend } from 'recharts';
 import { LayoutDashboard, Package, Warehouse, ShoppingCart, BarChart3, Plus, Edit, Trash2, Download, AlertTriangle, X, ChevronDown, Search, MessageSquare, Star } from 'lucide-react';
-import axios from 'axios';
 import './Admin.css';
 
 const TABS = [
@@ -36,9 +35,11 @@ export default function Admin() {
   const [invFilter, setInvFilter] = useState('');
   const [expandedOrder, setExpandedOrder] = useState(null);
   const [orderDetail, setOrderDetail] = useState(null);
+  const [lowStockProducts, setLowStockProducts] = useState([]);
   const [form, setForm] = useState({
     name:'',description:'',category:'Ceramic',material:'',color:'',size:'30x30',
-    roomApplication:'Floor',price:'',stock:'',imageUrl:'',isActive:true
+    roomApplication:'Floor',price:'',stock:'',imageUrl:'',isActive:true,
+    promoType:'none',promoMinQuantity:'',promoDiscountPercent:'',promoFreebieProductId:''
   });
 
   useEffect(() => {
@@ -150,17 +151,28 @@ export default function Admin() {
     }
   };
 
+  const loadLowStockProducts = () => {
+    adminAPI.getLowStockFreebies().then(({ data }) => setLowStockProducts(data)).catch(() => setLowStockProducts([]));
+  };
+
   const openEditModal = (p) => {
     setEditProduct(p);
     setForm({ name:p.name, description:p.description, category:p.category, material:p.material,
       color:p.color, size:p.size, roomApplication:p.room_application, price:p.price,
-      stock:p.stock_qty||0, imageUrl:p.image_url, isActive:p.is_active });
+      stock:p.stock_qty||0, imageUrl:p.image_url, isActive:p.is_active,
+      promoType:p.promo_type || 'none',
+      promoMinQuantity:p.promo_min_quantity || '',
+      promoDiscountPercent:p.promo_discount_percent || '',
+      promoFreebieProductId:p.freebie_product_id || '' });
+    loadLowStockProducts();
     setShowModal(true);
   };
 
   const openAddModal = () => {
     setEditProduct(null);
-    setForm({name:'',description:'',category:'Ceramic',material:'',color:'',size:'30x30',roomApplication:'Floor',price:'',stock:'',imageUrl:'',isActive:true});
+    setForm({name:'',description:'',category:'Ceramic',material:'',color:'',size:'30x30',roomApplication:'Floor',price:'',stock:'',imageUrl:'',isActive:true,
+      promoType:'none',promoMinQuantity:'',promoDiscountPercent:'',promoFreebieProductId:''});
+    loadLowStockProducts();
     setShowModal(true);
   };
 
@@ -215,11 +227,13 @@ export default function Admin() {
                 <button className="btn btn-primary" onClick={openAddModal}><Plus size={16} /> Add Product</button>
               </div>
             </div>
-            <div className="table-wrapper"><table><thead><tr><th>Image</th><th>Name</th><th>Category</th><th>Price</th><th>Stock</th><th>Status</th><th>Actions</th></tr></thead><tbody>
+            <div className="table-wrapper"><table><thead><tr><th>Image</th><th>Name</th><th>Category</th><th>Price</th><th>Stock</th><th>Promo</th><th>Status</th><th>Actions</th></tr></thead><tbody>
               {products.map(p => (
                 <tr key={p.id}><td><img src={p.image_url} style={{width:40,height:40,objectFit:'cover',borderRadius:4}} /></td>
                 <td><strong>{p.name}</strong></td><td>{p.category}</td><td>{formatPHP(p.price)}</td>
-                <td>{p.stock_qty ?? '—'}</td><td><span className={`badge ${p.is_active?'badge-success':'badge-error'}`}>{p.is_active?'Active':'Inactive'}</span></td>
+                <td>{p.stock_qty ?? '—'}</td>
+                <td><span className={`badge ${p.promo_type === 'volume' ? 'badge-warning' : p.promo_type === 'freebie' ? 'badge-success' : 'badge-primary'}`}>{p.promo_type === 'volume' ? 'Bulk Savings' : p.promo_type === 'freebie' ? 'Free Gift' : 'None'}</span></td>
+                <td><span className={`badge ${p.is_active?'badge-success':'badge-error'}`}>{p.is_active?'Active':'Inactive'}</span></td>
                 <td><div className="flex gap-sm"><button className="btn btn-ghost btn-sm" onClick={()=>openEditModal(p)}><Edit size={14}/></button><button className="btn btn-ghost btn-sm" onClick={()=>handleDelete(p.id)}><Trash2 size={14}/></button></div></td></tr>
               ))}
             </tbody></table></div>
@@ -381,6 +395,40 @@ export default function Admin() {
                 <label>Product Image</label>
                 <input className="input" type="file" accept="image/*" onChange={handleImageChange} />
                 {form.imageUrl && <img src={form.imageUrl} alt="Preview" style={{marginTop:8, maxHeight:100, borderRadius:4, objectFit:'cover'}} />}
+              </div>
+              <div className="promo-admin-section">
+                <div className="promo-admin-heading">
+                  <h4>Promotions Setup</h4>
+                  <p>Choose how this tile should be promoted to customers.</p>
+                </div>
+                <div className="form-grid">
+                  <div className="input-group">
+                    <label>Promotion Type</label>
+                    <select className="input" value={form.promoType} onChange={e=>setForm(p=>({...p,promoType:e.target.value}))}>
+                      <option value="none">None</option>
+                      <option value="volume">Volume Discount</option>
+                      <option value="freebie">Clearance Bundle / Free Low-Stock Tile</option>
+                    </select>
+                  </div>
+                  {form.promoType === 'volume' && (
+                    <>
+                      <div className="input-group"><label>Minimum Quantity</label><input className="input" type="number" min="1" value={form.promoMinQuantity} onChange={e=>setForm(p=>({...p,promoMinQuantity:e.target.value}))} placeholder="50" /></div>
+                      <div className="input-group"><label>Discount Percentage</label><input className="input" type="number" min="1" max="99" value={form.promoDiscountPercent} onChange={e=>setForm(p=>({...p,promoDiscountPercent:e.target.value}))} placeholder="10" /></div>
+                    </>
+                  )}
+                  {form.promoType === 'freebie' && (
+                    <div className="input-group">
+                      <label>Freebie Selection</label>
+                      <select className="input" value={form.promoFreebieProductId} onChange={e=>setForm(p=>({...p,promoFreebieProductId:e.target.value}))}>
+                        <option value="">Select low-stock tile</option>
+                        {lowStockProducts
+                          .filter(item => !editProduct || item.id !== editProduct.id)
+                          .map(item => <option key={item.id} value={item.id}>{item.name} ({item.stock_qty} left)</option>)}
+                      </select>
+                      <span className="promo-admin-note">Only active tiles at or below their low-stock threshold appear here.</span>
+                    </div>
+                  )}
+                </div>
               </div>
               <label className="filter-checkbox" style={{marginTop:12}}><input type="checkbox" checked={form.isActive} onChange={e=>setForm(p=>({...p,isActive:e.target.checked}))} /><span>Active</span></label>
             </div>
