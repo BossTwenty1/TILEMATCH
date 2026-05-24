@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { ordersAPI, authAPI } from '../services/api';
+import { ordersAPI, authAPI, addressAPI } from '../services/api';
 import { formatPHP } from '../utils/helpers';
 import { useToast } from '../context/ToastContext';
 import { User, LogOut, Package, Eye } from 'lucide-react';
 import './Account.css';
 
-const Field = React.memo(({ label, name, type = 'text', value, onChange }) => (
+const Field = React.memo(({ label, name, type = 'text', value, onChange, disabled = false }) => (
   <div className="input-group">
     <label>{label}</label>
     <input 
@@ -17,6 +17,7 @@ const Field = React.memo(({ label, name, type = 'text', value, onChange }) => (
       value={value || ''}
       onChange={onChange} 
       required 
+      disabled={disabled}
     />
   </div>
 ));
@@ -28,9 +29,13 @@ export default function Account() {
   const [mode, setMode] = useState('login');
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(false);
+  
+  const [municipalities, setMunicipalities] = useState([]);
+  const [barangays, setBarangays] = useState([]);
+
   const [formData, setFormData] = useState({
     loginEmail: '', loginPassword: '', registerEmail: '', registerPassword: '', userEmail: '', 
-    firstName: '', lastName: '', phone: '', municipality: '', city: '', 
+    firstName: '', lastName: '', phone: '', municipality: '', municipalityId: '',
     barangay: '', street: '', postalCode: '',
   });
   const [error, setError] = useState('');
@@ -39,6 +44,36 @@ export default function Account() {
     const { name, value } = e.target;
     setFormData(p => ({ ...p, [name]: value }));
   }, []);
+
+  useEffect(() => {
+    if (mode === 'register') {
+      addressAPI.getMunicipalities()
+        .then(({ data }) => setMunicipalities(data))
+        .catch(() => setError('Failed to load municipalities.'));
+    }
+  }, [mode]);
+
+  const handleMunicipalityChange = (e) => {
+    const selectedId = e.target.value;
+    const match = municipalities.find(m => String(m.id) === selectedId);
+
+    if (match) {
+      setFormData(p => ({
+        ...p,
+        municipalityId: selectedId,
+        municipality: match.name,
+        postalCode: match.zip_code || '',
+        barangay: ''
+      }));
+
+      addressAPI.getBarangays(selectedId)
+        .then(({ data }) => setBarangays(data))
+        .catch(() => setError('Failed to load barangays for this area.'));
+    } else {
+      setFormData(p => ({ ...p, municipalityId: '', municipality: '', postalCode: '', barangay: '' }));
+      setBarangays([]);
+    }
+  };
 
   useEffect(() => {
     if (isLoggedIn) {
@@ -87,9 +122,6 @@ export default function Account() {
     } finally { setLoading(false); }
   };
 
-  
-
-  // Logged in: show profile + orders
   if (isLoggedIn) {
     return (
       <div className="account-page page">
@@ -109,7 +141,7 @@ export default function Account() {
               <div className="profile-detail"><span>Email</span><strong>{user.email}</strong></div>
               <div className="profile-detail"><span>Phone</span><strong>{user.phone || '—'}</strong></div>
               <div className="profile-detail"><span>Address</span><strong>
-                {user.address?.street && `${user.address.street}, ${user.address.barangay}, ${user.address.city}, ${user.address.municipality} ${user.address.postalCode}`}
+                {user.address?.street && `${user.address.street}, ${user.address.barangay}, ${user.address.municipality} ${user.address.postalCode}`}
                 {!user.address?.street && '—'}
               </strong></div>
             </div>
@@ -145,7 +177,6 @@ export default function Account() {
     );
   }
 
-  // Not logged in: login/register forms
   return (
     <div className="auth-page page">
       <div className="container">
@@ -194,11 +225,42 @@ export default function Account() {
                   <Field label="Email" name="registerEmail" type="email" value={formData.registerEmail} onChange={handleChange}/>
                   <Field label="Password" name="registerPassword" type="password" value={formData.registerPassword} onChange={handleChange}/>
                   <Field label="Phone" name="phone" type="tel" value={formData.phone} onChange={handleChange}/>
-                  <Field label="Municipality" name="municipality" value={formData.municipality} onChange={handleChange}/>
-                  <Field label="City" name="city" value={formData.city} onChange={handleChange}/>
-                  <Field label="Barangay" name="barangay" value={formData.barangay} onChange={handleChange}/>
+                  
+                  <div className="input-group">
+                    <label>Municipality</label>
+                    <select 
+                      className="input" 
+                      name="municipalityId" 
+                      value={formData.municipalityId} 
+                      onChange={handleMunicipalityChange} 
+                      required
+                    >
+                      <option value="">Select Municipality</option>
+                      {municipalities.map(m => (
+                        <option key={m.id} value={m.id}>{m.name}</option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div className="input-group">
+                    <label>Barangay</label>
+                    <select 
+                      className="input" 
+                      name="barangay" 
+                      value={formData.barangay} 
+                      onChange={handleChange} 
+                      disabled={!formData.municipalityId}
+                      required
+                    >
+                      <option value="">Select Barangay</option>
+                      {barangays.map(b => (
+                        <option key={b.id} value={b.name}>{b.name}</option>
+                      ))}
+                    </select>
+                  </div>
+
                   <Field label="Street + House No." name="street" value={formData.street} onChange={handleChange}/>
-                  <Field label="Postal Code" name="postalCode" value={formData.postalCode} onChange={handleChange}/>
+                  <Field label="Postal Code" name="postalCode" value={formData.postalCode} onChange={handleChange} disabled={true}/>
                 </div>
                 <button className="btn btn-primary btn-lg btn-block" type="submit" disabled={loading} style={{marginTop:20}}>
                   {loading ? 'Creating Account...' : 'Register'}

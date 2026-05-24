@@ -39,6 +39,12 @@ export const authAPI = {
   resetPassword: (token, password) => api.post('/auth/reset-password', { token, password })
 };
 
+// === ADDRESS LOOKUPS ===
+export const addressAPI = {
+  getMunicipalities: () => api.get('/address/municipalities'),
+  getBarangays: (municipalityId) => api.get(`/address/barangays?municipalityId=${municipalityId}`)
+};
+
 // === PRODUCTS ===
 export const productsAPI = {
   getAll: (params) => api.get('/products', { params }),
