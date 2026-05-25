@@ -49,6 +49,11 @@ router.get('/', async (req, res) => {
 router.post('/add', async (req, res) => {
   try {
     const { productId, quantity = 1 } = req.body;
+    const requestedQuantity = Number(quantity);
+
+    if (!Number.isInteger(requestedQuantity) || requestedQuantity < 1) {
+      return res.status(400).json({ error: 'Quantity must be at least 1.' });
+    }
 
     // Check product exists and has stock (FR-67)
     const [products] = await db.execute(
@@ -57,7 +62,7 @@ router.post('/add', async (req, res) => {
     );
     if (products.length === 0) return res.status(404).json({ error: 'Product not found.' });
     if (products[0].stock_qty <= 0) return res.status(400).json({ error: 'Product is out of stock.' });
-    if (quantity > products[0].stock_qty) return res.status(400).json({ error: `Only ${products[0].stock_qty} units available.` });
+    if (requestedQuantity > products[0].stock_qty) return res.status(400).json({ error: `Only ${products[0].stock_qty} units available.` });
 
     // Get cart
     let [carts] = await db.execute('SELECT id FROM cart WHERE customer_id = ?', [req.user.id]);
@@ -75,13 +80,13 @@ router.post('/add', async (req, res) => {
 
     if (existing.length > 0) {
       // FR-23: Update quantity
-      const newQty = existing[0].quantity + quantity;
+      const newQty = Number(existing[0].quantity) + requestedQuantity;
       if (newQty > products[0].stock_qty) {
         return res.status(400).json({ error: `Cannot add more. Only ${products[0].stock_qty} units available.` });
       }
       await db.execute('UPDATE cart_items SET quantity = ? WHERE id = ?', [newQty, existing[0].id]);
     } else {
-      await db.execute('INSERT INTO cart_items (cart_id, product_id, quantity) VALUES (?, ?, ?)', [cartId, productId, quantity]);
+      await db.execute('INSERT INTO cart_items (cart_id, product_id, quantity) VALUES (?, ?, ?)', [cartId, productId, requestedQuantity]);
     }
 
     // FR-19: Return confirmation
@@ -96,12 +101,15 @@ router.post('/add', async (req, res) => {
 router.put('/update', async (req, res) => {
   try {
     const { productId, quantity } = req.body;
+    const requestedQuantity = Number(quantity);
 
-    if (quantity < 1) return res.status(400).json({ error: 'Quantity must be at least 1.' });
+    if (!Number.isInteger(requestedQuantity) || requestedQuantity < 1) {
+      return res.status(400).json({ error: 'Quantity must be at least 1.' });
+    }
 
     // Check stock
     const [inv] = await db.execute('SELECT stock_qty FROM inventory WHERE product_id = ?', [productId]);
-    if (inv.length > 0 && quantity > inv[0].stock_qty) {
+    if (inv.length > 0 && requestedQuantity > inv[0].stock_qty) {
       return res.status(400).json({ error: `Only ${inv[0].stock_qty} units available.` });
     }
 
@@ -111,7 +119,7 @@ router.put('/update', async (req, res) => {
     // FR-25: Update and recalculate
     await db.execute(
       'UPDATE cart_items SET quantity = ? WHERE cart_id = ? AND product_id = ?',
-      [quantity, carts[0].id, productId]
+      [requestedQuantity, carts[0].id, productId]
     );
 
     res.json({ message: 'Cart updated.' });

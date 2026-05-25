@@ -156,7 +156,7 @@ CREATE TABLE orders (
   ship_street         VARCHAR(255) NOT NULL,
   ship_postal_code    VARCHAR(10) NOT NULL,
   subtotal            DECIMAL(10,2) NOT NULL,
-  tax                 DECIMAL(10,2) NOT NULL,         -- 12% VAT
+  tax                 DECIMAL(10,2) NOT NULL DEFAULT 0,
   shipping_fee        DECIMAL(10,2) NOT NULL,
   total               DECIMAL(10,2) NOT NULL,
   status              ENUM('Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled') NOT NULL DEFAULT 'Pending',

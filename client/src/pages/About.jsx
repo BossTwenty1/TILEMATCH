@@ -12,7 +12,7 @@ const PROMISES = [
   { icon: <Gem size={28} />, title: 'Product Superiority', text: 'Carefully selected ceramic, porcelain, glass, natural stone, and decorative tiles for long-lasting interiors.' },
   { icon: <Palette size={28} />, title: 'Widest Selection', text: 'Curated styles for kitchens, baths, living spaces, accents, and commercial surfaces.' },
   { icon: <Handshake size={28} />, title: 'Helpful Guidance', text: 'Practical support from selection to checkout, including quantity planning and order assistance.' },
-  { icon: <MapPinned size={28} />, title: 'Local Accessibility', text: 'A Naga-based operation built to serve homes, designers, contractors, and growing businesses.' }
+  { icon: <MapPinned size={28} />, title: 'Local Accessibility', text: 'A Legazpi and Daraga-focused operation built to serve homes, designers, contractors, and growing businesses.' }
 ];
 
 const METRICS = [
@@ -117,26 +117,25 @@ export default function About() {
         <div className="container about-reach-grid">
           <div className="about-location-card">
             <iframe
-              title="TileMatch Naga City service area"
-              src="https://www.google.com/maps?q=Naga%20City%20Camarines%20Sur&output=embed"
+              title="TileMatch Legazpi and Daraga service area"
+              src="https://www.google.com/maps?q=Legazpi%20City%20Daraga%20Albay&output=embed"
               loading="lazy"
               referrerPolicy="no-referrer-when-downgrade"
               allowFullScreen
             />
             <div className="about-location-summary">
-              <strong>Naga City Design Studio</strong>
-              <span>Serving Camarines Sur and nearby Bicol provinces</span>
+              <strong>Legazpi and Daraga Service Area</strong>
+              <span>Serving Albay customers around Legazpi City and Daraga</span>
             </div>
           </div>
           <div className="about-reach-copy">
             <span className="about-section-kicker">Our Reach</span>
             <h2>Designed for local service, ready for wider delivery.</h2>
-            <p>TileMatch is based in Naga City and supports customers across nearby provinces through careful packing, coordinated delivery, and transparent order tracking.</p>
+            <p>TileMatch supports customers in the Legazpi City and Daraga area through careful packing, coordinated delivery, and transparent order tracking.</p>
             <div className="about-service-areas" aria-label="Service areas">
-              <span>Naga City</span>
-              <span>Camarines Sur</span>
+              <span>Legazpi City</span>
+              <span>Daraga</span>
               <span>Albay</span>
-              <span>Nationwide coordination</span>
             </div>
             <div className="about-metrics-grid">
               {METRICS.map((metric) => (

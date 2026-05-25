@@ -91,7 +91,7 @@ export default function Tracking() {
               </div>
               <div className="tracking-section">
                 <h4>Shipping Address</h4>
-                <p>{order.ship_street}, {order.ship_barangay}<br/>{order.ship_city}, {order.ship_municipality} {order.ship_postal_code}</p>
+                <p>{order.ship_street}, {order.ship_barangay}<br/>{order.ship_municipality} {order.ship_postal_code}</p>
               </div>
               <div className="tracking-section">
                 <h4>Payment</h4>

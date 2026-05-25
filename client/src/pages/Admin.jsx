@@ -327,7 +327,7 @@ export default function Admin() {
                         <div><h4>Items</h4>{(orderDetail.items||[]).map((item,i) => (
                           <div key={i} className="checkout-item"><span>{item.product_name} × {item.quantity}</span><span>{formatPHP(item.line_total)}</span></div>
                         ))}</div>
-                        <div><h4>Shipping</h4><p>{orderDetail.ship_street}, {orderDetail.ship_barangay}<br/>{orderDetail.ship_city}, {orderDetail.ship_municipality} {orderDetail.ship_postal_code}</p></div>
+                        <div><h4>Shipping</h4><p>{orderDetail.ship_street}, {orderDetail.ship_barangay}<br/>{orderDetail.ship_municipality} {orderDetail.ship_postal_code}</p></div>
                       </div>
                     </td></tr>
                   )}

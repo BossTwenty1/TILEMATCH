@@ -1,0 +1,125 @@
+barangay_id,municipality_id,name
+1,1,Alcala
+2,1,Alobo
+3,1,Anislag
+4,1,Bagumbayan
+5,1,Balinad
+6,1,Bañadero
+7,1,Bañag
+8,1,Bascaran
+9,1,Bigao
+10,1,Binitayan
+11,1,Bongalon
+12,1,Budiao
+13,1,Burgos
+14,1,Busay
+15,1,Canarom
+16,1,Cullat
+17,1,Dela Paz
+18,1,Dinoronan
+19,1,Gabawan
+20,1,Gapo
+21,1,Ibaugan
+22,1,Ilawod Area Poblacion
+23,1,Inarado
+24,1,Kidaco
+25,1,Kilicao
+26,1,Kimantong
+27,1,Kinawitan
+28,1,Kiwalo
+29,1,Lacag
+30,1,Mabini
+31,1,Malabog
+32,1,Malobago
+33,1,Maopi
+34,1,Market Area (Poblacion)
+35,1,Maroroy
+36,1,Matnog
+37,1,Mayon
+38,1,Mi-isi
+39,1,Nabasan
+40,1,Namantao
+41,1,Pandan
+42,1,Peñafrancia
+43,1,Sagpon
+44,1,Salvacion
+45,1,San Rafael
+46,1,San Ramon
+47,1,San Roque
+48,1,San Vicente Grande
+49,1,San Vicente Pequeño
+50,1,Sipi
+51,1,Tabon-tabon
+52,1,Tagas
+53,1,Talahib
+54,1,Villahermosa
+55,2,Barangay 1-Em's Barrio
+56,2,Barangay 2-Em's Barrio South
+57,2,Barangay 3-Em's Barrio East
+58,2,Barangay 4-Sagpon Poblacion
+59,2,Barangay 5-Sagmin Poblacion
+60,2,Barangay 6-Bañadero Poblacion
+61,2,Barangay 7-Baño
+62,2,Barangay 8-Bagumbayan
+63,2,Barangay 9-Pinaric
+64,2,Barangay 10-Cabugao
+65,2,Barangay 11-Maoyod Poblacion
+66,2,Barangay 12-Tula-tula
+67,2,Barangay 13-Ilawod West Poblacion
+68,2,Barangay 14-Ilawod Poblacion
+69,2,Barangay 15-Ilawod East Poblacion
+70,2,Barangay 16-Kawit-East Washington Drive
+71,2,"Barangay 17-Rizal Street, Ilawod"
+72,2,Barangay 18-Cabagñan West
+73,2,Barangay 19-Cabagñan
+74,2,Barangay 20-Cabagñan East
+75,2,Barangay 21-Binanuahan West
+76,2,Barangay 22-Binanuahan East
+77,2,Barangay 23-Imperial Court Subd.
+78,2,Barangay 24-Rizal Street
+79,2,Barangay 25-Lapu-lapu
+80,2,Barangay 26-Dinagaan
+81,2,Barangay 27-Victory Village South
+82,2,Barangay 28-Victory Village North
+83,2,Barangay 29-Sabang
+84,2,Barangay 30-Pigcale
+85,2,Barangay 31-Centro-Baybay
+86,2,Barangay 32-San Roque
+87,2,Barangay 33-PNR-Peñaranda St.-Iraya
+88,2,Barangay 34-Oro Site-Magallanes St.
+89,2,Barangay 35-Tinago
+90,2,Barangay 36-Kapantawan
+91,2,Barangay 37-Bitano
+92,2,Barangay 38-Gogon
+93,2,Barangay 39-Bonot
+94,2,Barangay 40-Cruzada
+95,2,Barangay 41-Bogtong
+96,2,Barangay 42-Rawis
+97,2,Barangay 43-Tamaoyan
+98,2,Barangay 44-Pawa
+99,2,Barangay 45-Dita
+100,2,Barangay 46-San Joaquin
+101,2,Barangay 47-Arimbay
+102,2,Barangay 48-Bagong Abre
+103,2,Barangay 49-Bigaa
+104,2,Barangay 50-Padang
+105,2,Barangay 51-Buyuan
+106,2,Barangay 52-Matanag
+107,2,Barangay 53-Bonga
+108,2,Barangay 54-Mabinit
+109,2,Barangay 55-Estanza
+110,2,Barangay 56-Taysan
+111,2,Barangay 57-Dap-dap
+112,2,Barangay 58-Buragwis
+113,2,Barangay 59-Puro
+114,2,Barangay 60-Lamba
+115,2,Barangay 61-Maslog
+116,2,Barangay 62-Homapon
+117,2,Barangay 63-Mariawa
+118,2,Barangay 64-Bagacay
+119,2,Barangay 65-Imalnod
+120,2,Barangay 66-Banquerohan
+121,2,Barangay 67-Bariis
+122,2,Barangay 68-San Francisco
+123,2,Barangay 69-Buenavista
+124,2,Barangay 70-Cagbacong

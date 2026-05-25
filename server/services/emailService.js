@@ -29,7 +29,7 @@ const logEmail = async (recipient, subject, body, status) => {
 const sendOrderConfirmation = async (order) => {
   const itemsList = order.items.map(i => `• ${i.product_name} x${i.quantity} — PHP ${i.line_total.toFixed(2)}`).join('\n');
   const subject = `Order Confirmed — ${order.order_number}`;
-  const body = `Hi ${order.customer_name},\n\nYour order has been placed successfully!\n\nOrder #: ${order.order_number}\nPayment Ref: ${order.payment_ref}\n\nItems:\n${itemsList}\n\nSubtotal: PHP ${order.subtotal.toFixed(2)}\nTax (12%): PHP ${order.tax.toFixed(2)}\nShipping: PHP ${order.shipping_fee.toFixed(2)}\nTotal: PHP ${order.total.toFixed(2)}\n\nEstimated Delivery: ${order.estimated_delivery}\n\nThank you for shopping at TileMatch!`;
+  const body = `Hi ${order.customer_name},\n\nYour order has been placed successfully!\n\nOrder #: ${order.order_number}\nPayment Ref: ${order.payment_ref}\n\nItems:\n${itemsList}\n\nSubtotal: PHP ${order.subtotal.toFixed(2)}\nShipping: PHP ${order.shipping_fee.toFixed(2)}\nTotal: PHP ${order.total.toFixed(2)}\n\nEstimated Delivery: ${order.estimated_delivery}\n\nThank you for shopping at TileMatch!`;
 
   try {
     await transporter.sendMail({

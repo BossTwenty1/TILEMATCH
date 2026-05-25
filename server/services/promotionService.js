@@ -108,6 +108,7 @@ const savePromotion = async (db, productId, promotion) => {
 const buildCartPricing = (items) => {
   const displayItems = [];
   let subtotal = 0;
+  let discountedSubtotal = 0;
   let savings = 0;
   let itemCount = 0;
 
@@ -155,7 +156,8 @@ const buildCartPricing = (items) => {
     };
 
     displayItems.push(pricedItem);
-    subtotal += lineTotal;
+    subtotal += originalLineTotal;
+    discountedSubtotal += lineTotal;
     savings += promoSavings;
     itemCount += item.quantity;
 
@@ -175,25 +177,26 @@ const buildCartPricing = (items) => {
         stock_qty: Number(item.freebie_stock_qty),
         original_line_total: roundMoney(freebiePrice),
         line_total: 0,
-        promo_savings: roundMoney(freebiePrice),
+        promo_savings: 0,
         promo_applied: true,
         promo_message: `Free bonus with ${item.name}`,
         is_freebie: true,
         locked: true
       });
-      savings += roundMoney(freebiePrice);
     }
   }
 
   subtotal = roundMoney(subtotal);
-  const shippingFee = subtotal >= 2000 ? 0 : 200;
-  const tax = roundMoney(subtotal * 0.12);
-  const total = roundMoney(subtotal + shippingFee + tax);
+  discountedSubtotal = roundMoney(discountedSubtotal);
+  const shippingFee = discountedSubtotal >= 2000 ? 0 : 200;
+  const tax = 0;
+  const total = roundMoney(discountedSubtotal + shippingFee);
 
   return {
     items: displayItems,
     itemCount,
     subtotal,
+    discountedSubtotal,
     shippingFee,
     tax,
     total,

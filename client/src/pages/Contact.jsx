@@ -7,13 +7,14 @@ import { useToast } from '../context/ToastContext';
 import './Contact.css';
 
 const BRANCH = {
-  name: 'TileMatch Naga Design Studio',
-  address: 'Unit 204, Magsaysay Avenue, Barangay Balatas, Naga City, Camarines Sur 4400',
-  phone: '0917-845-3628',
-  secondaryPhone: '(054) 472-1186',
+  name: 'Mariwasa Tiles - Legazpi Citi Home Depot',
+  address: '189 Rizal St, Legazpi Port District, Legazpi City, 4500 Albay',
+  phone: '(052) 480-6299',
+  secondaryPhone: '(05221) 43117',
   email: 'support@tilematch.com',
-  hours: 'Mon-Sat, 9:00 AM - 7:00 PM',
-  map: 'https://www.google.com/maps?q=Magsaysay%20Avenue%20Naga%20City%20Camarines%20Sur&output=embed'
+  hours: 'Mon-Sat, 8:00 AM - 6:00 PM',
+  sundayHours: 'Sunday, 8:30 AM - 12:30 PM',
+  map: 'https://www.google.com/maps?q=Mariwasa%20Tiles%20Legazpi%20Citi%20Home%20Depot%20189%20Rizal%20St%20Legazpi%20City%20Albay&output=embed'
 };
 
 const SERVICES = [
@@ -120,7 +121,7 @@ export default function Contact() {
                 <span className="contact-detail-icon"><Clock size={22} /></span>
                 <div>
                   <strong>{BRANCH.hours}</strong>
-                  <p>Closed on Sundays and selected holidays</p>
+                  <p>{BRANCH.sundayHours}</p>
                 </div>
               </div>
               <div className="contact-detail">
@@ -215,13 +216,13 @@ export default function Contact() {
         <div className="container contact-map-grid">
           <div className="contact-map-copy">
             <span className="section-kicker">Find us</span>
-            <h2>Drop by the TileMatch showroom in Naga City.</h2>
+            <h2>Drop by the Legazpi tile location.</h2>
             <p>Use the map for directions, then message us ahead if you need stock checked before your visit.</p>
             <Link className="btn btn-secondary" to="/shop">Browse Tiles Before Visiting</Link>
           </div>
           <div className="contact-map-frame">
             <iframe
-              title="TileMatch Naga City location map"
+              title="Mariwasa Tiles Legazpi Citi Home Depot location map"
               src={BRANCH.map}
               loading="lazy"
               referrerPolicy="no-referrer-when-downgrade"

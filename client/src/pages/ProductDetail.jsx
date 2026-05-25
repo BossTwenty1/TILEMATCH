@@ -14,6 +14,7 @@ export default function ProductDetail() {
   const [loading, setLoading] = useState(true);
   const [selectedImage, setSelectedImage] = useState(0);
   const [quantity, setQuantity] = useState(1);
+  const [quantityDraft, setQuantityDraft] = useState('1');
   const [zoomed, setZoomed] = useState(false);
   const { addItem } = useCart();
   const { addToast } = useToast();
@@ -22,17 +23,33 @@ export default function ProductDetail() {
 
   useEffect(() => {
     productsAPI.getById(id)
-      .then(({ data }) => { setProduct(data); setSelectedImage(0); })
+      .then(({ data }) => { setProduct(data); setSelectedImage(0); setQuantity(1); setQuantityDraft('1'); })
       .catch(() => navigate('/shop'))
       .finally(() => setLoading(false));
   }, [id, navigate]);
 
+  const clampQuantity = (value, max) => {
+    const numericValue = Number(value);
+    if (!Number.isFinite(numericValue)) return 1;
+    const wholeNumber = Math.floor(numericValue);
+    return Math.min(Math.max(wholeNumber, 1), Number(max) || Number.MAX_SAFE_INTEGER);
+  };
+
+  const commitQuantity = (value) => {
+    const nextQuantity = clampQuantity(value, product?.stock_qty);
+    setQuantity(nextQuantity);
+    setQuantityDraft(String(nextQuantity));
+    return nextQuantity;
+  };
+
   const handleAdd = async () => {
     if (!isLoggedIn) { navigate('/account'); return; }
+    const selectedQuantity = commitQuantity(quantityDraft);
     try {
-      const data = await addItem(product.id, quantity);
+      const data = await addItem(product.id, selectedQuantity);
       addToast(data.message || 'Added to cart!');
       setQuantity(1);
+      setQuantityDraft('1');
     } catch (err) {
       addToast(err.response?.data?.error || 'Error', 'error');
     }
@@ -124,9 +141,25 @@ export default function ProductDetail() {
             {!outOfStock && (
               <div className="pd-actions">
                 <div className="qty-selector">
-                  <button onClick={() => setQuantity(Math.max(1, quantity - 1))}><Minus size={16} /></button>
-                  <span>{quantity}</span>
-                  <button onClick={() => setQuantity(Math.min(product.stock_qty, quantity + 1))}><Plus size={16} /></button>
+                  <button aria-label="Decrease quantity" onClick={() => commitQuantity(quantity - 1)}><Minus size={16} /></button>
+                  <input
+                    className="qty-input"
+                    type="number"
+                    min="1"
+                    max={product.stock_qty}
+                    value={quantityDraft}
+                    onChange={(event) => {
+                      const value = event.target.value.replace(/[^\d]/g, '');
+                      setQuantityDraft(value);
+                      if (value) setQuantity(clampQuantity(value, product.stock_qty));
+                    }}
+                    onBlur={(event) => commitQuantity(event.target.value)}
+                    onKeyDown={(event) => {
+                      if (event.key === 'Enter') event.currentTarget.blur();
+                    }}
+                    aria-label={`Quantity for ${product.name}`}
+                  />
+                  <button aria-label="Increase quantity" onClick={() => commitQuantity(quantity + 1)}><Plus size={16} /></button>
                 </div>
                 <button className="btn btn-primary btn-lg" onClick={handleAdd}>
                   <ShoppingCart size={18} /> Add to Cart - {formatPHP(discountedUnitPrice * quantity)}

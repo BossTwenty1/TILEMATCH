@@ -32,8 +32,8 @@ export default function Footer() {
           <div className="footer-contact">
             <h4>Contact Us</h4>
             <p><Mail size={14} /> support@tilematch.com</p>
-            <p><Phone size={14} /> 0917-TILE-MATCH</p>
-            <p><MapPin size={14} /> Naga City, Camarines Sur</p>
+            <p><Phone size={14} /> (052) 480-6299</p>
+            <p><MapPin size={14} /> Legazpi City and Daraga, Albay</p>
           </div>
           <div className="footer-payments">
             <h4>Payment Methods</h4>

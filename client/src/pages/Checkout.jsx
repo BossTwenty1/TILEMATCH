@@ -4,8 +4,10 @@ import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
 import { ordersAPI } from '../services/api';
+import { getPricedTotals } from '../utils/pricing';
 import { formatPHP } from '../utils/helpers';
 import { ArrowLeft, ArrowRight, CheckCircle, Gift, Smartphone } from 'lucide-react';
+import AddressFields from '../components/AddressFields';
 import './Checkout.css';
 
 const Field = React.memo(({ label, name, type = 'text', shipping, setShipping, errors }) => (
@@ -18,7 +20,7 @@ const Field = React.memo(({ label, name, type = 'text', shipping, setShipping, e
 ));
 
 export default function Checkout() {
-  const { items, subtotal, shippingFee, tax, total, clearCart } = useCart();
+  const { items, clearCart, fetchCart } = useCart();
   const { user } = useAuth();
   const { addToast } = useToast();
   const navigate = useNavigate();
@@ -28,12 +30,34 @@ export default function Checkout() {
   const [shipping, setShipping] = useState({
     firstName: user?.firstName || '', lastName: user?.lastName || '',
     email: user?.email || '', phone: user?.phone || '',
-    municipality: user?.address?.municipality || '', city: user?.address?.city || '',
+    municipality: user?.address?.municipality || '', city: user?.address?.municipality || user?.address?.city || '',
     barangay: user?.address?.barangay || '', street: user?.address?.street || '',
     postalCode: user?.address?.postalCode || ''
   });
   const [errors, setErrors] = useState({});
   const [orderCompleted, setOrderCompleted] = useState(false);
+
+  const handleAddressChange = React.useCallback((updates) => {
+    setShipping((previous) => ({ ...previous, ...updates }));
+  }, []);
+
+  const checkoutProductIds = React.useMemo(() => {
+    try {
+      return JSON.parse(sessionStorage.getItem('tilematch_checkout_items') || '[]').map(Number).filter(Boolean);
+    } catch {
+      return [];
+    }
+  }, []);
+  const selectedProductIds = checkoutProductIds.length
+    ? checkoutProductIds
+    : items.filter((item) => !item.is_freebie).map((item) => Number(item.product_id));
+  const checkoutItems = items.filter((item) => (
+    item.is_freebie
+      ? selectedProductIds.includes(Number(item.parent_product_id))
+      : selectedProductIds.includes(Number(item.product_id))
+  ));
+  const checkoutTotals = getPricedTotals(checkoutItems);
+  const selectedPaidItems = checkoutItems.filter((item) => !item.is_freebie);
 
   const validateStep1 = () => {
     const e = {};
@@ -42,7 +66,6 @@ export default function Checkout() {
     if (!shipping.email.trim()) e.email = 'Required';
     if (!shipping.phone.trim()) e.phone = 'Required';
     if (!shipping.municipality.trim()) e.municipality = 'Required';
-    if (!shipping.city.trim()) e.city = 'Required';
     if (!shipping.barangay.trim()) e.barangay = 'Required';
     if (!shipping.street.trim()) e.street = 'Required';
     if (!shipping.postalCode.trim()) e.postalCode = 'Required';
@@ -57,12 +80,17 @@ export default function Checkout() {
     setSubmitting(true);
     try {
       const { data } = await ordersAPI.place({
-        municipality: shipping.municipality, city: shipping.city,
+        municipality: shipping.municipality,
+        city: shipping.municipality,
         barangay: shipping.barangay, street: shipping.street,
-        postalCode: shipping.postalCode, paymentRef: gcashRef
+        postalCode: shipping.postalCode,
+        paymentRef: gcashRef,
+        productIds: selectedPaidItems.map((item) => item.product_id)
       });
       setOrderCompleted(true);
-      clearCart();
+      sessionStorage.removeItem('tilematch_checkout_items');
+      if (selectedPaidItems.length === items.filter((item) => !item.is_freebie).length) clearCart();
+      else await fetchCart();
       addToast('Order placed successfully!');
       navigate(`/confirmation/${data.order.orderNumber}`);
     } catch (err) {
@@ -70,7 +98,7 @@ export default function Checkout() {
     } finally { setSubmitting(false); }
   };
 
-  if (items.length === 0 && !orderCompleted) { navigate('/cart'); return null; }
+  if ((items.length === 0 || selectedPaidItems.length === 0) && !orderCompleted) { navigate('/cart'); return null; }
 
   return (
     <div className="checkout-page page">
@@ -92,11 +120,7 @@ export default function Checkout() {
                   <Field label="Last Name" name="lastName" shipping={shipping} setShipping={setShipping} errors={errors} />
                   <Field label="Email" name="email" type="email" shipping={shipping} setShipping={setShipping} errors={errors} />
                   <Field label="Phone" name="phone" type="tel" shipping={shipping} setShipping={setShipping} errors={errors} />
-                  <Field label="Municipality" name="municipality" shipping={shipping} setShipping={setShipping} errors={errors} />
-                  <Field label="City" name="city" shipping={shipping} setShipping={setShipping} errors={errors} />
-                  <Field label="Barangay" name="barangay" shipping={shipping} setShipping={setShipping} errors={errors} />
-                  <Field label="Street + House No." name="street" shipping={shipping} setShipping={setShipping} errors={errors} />
-                  <Field label="Postal Code" name="postalCode" shipping={shipping} setShipping={setShipping} errors={errors} />
+                  <AddressFields values={shipping} onChange={handleAddressChange} errors={errors} />
                 </div>
                 <div className="form-actions">
                   <button className="btn btn-ghost" onClick={() => navigate('/cart')}><ArrowLeft size={16} /> Back to Cart</button>
@@ -119,7 +143,7 @@ export default function Checkout() {
                   <div className="gcash-details" style={{ display: 'flex', gap: '24px', alignItems: 'flex-start', flexWrap: 'wrap' }}>
                     <div style={{ flex: 1, minWidth: '250px' }}>
                       <div className="gcash-row"><span>GCash Number:</span><strong>0917-TILE-MATCH</strong></div>
-                      <div className="gcash-row"><span>Amount to Pay:</span><strong className="gcash-amount">{formatPHP(total)}</strong></div>
+                      <div className="gcash-row"><span>Amount to Pay:</span><strong className="gcash-amount">{formatPHP(checkoutTotals.total)}</strong></div>
                       <div className="gcash-row" style={{ flexDirection: 'column', alignItems: 'flex-start', marginTop: 12 }}>
                         <span style={{ marginBottom: 8, fontWeight: 500 }}>Reference No *</span>
                         <input 
@@ -141,7 +165,7 @@ export default function Checkout() {
                 </div>
 
                 <h4 style={{marginTop:24}}>Order Summary</h4>
-                {items.map(item => (
+                {checkoutItems.map(item => (
                   <div key={`${item.is_freebie ? 'freebie' : 'item'}-${item.parent_product_id || item.product_id}-${item.product_id}`} className={`checkout-item ${item.is_freebie ? 'checkout-freebie' : ''}`}>
                     <span>{item.is_freebie && <Gift size={14} />} {item.is_freebie ? `[Bonus] ${item.name}` : item.name} x {item.quantity}</span>
                     <span>{item.is_freebie ? 'FREE' : formatPHP(item.line_total ?? item.price * item.quantity)}</span>
@@ -160,11 +184,11 @@ export default function Checkout() {
 
           <div className="checkout-summary card card-body">
             <h3>Summary</h3>
-            <div className="summary-row"><span>Items ({items.length})</span><span>{formatPHP(subtotal)}</span></div>
-            <div className="summary-row"><span>Shipping</span><span>{shippingFee === 0 ? 'Free' : formatPHP(shippingFee)}</span></div>
-            <div className="summary-row"><span>VAT (12%)</span><span>{formatPHP(tax)}</span></div>
+            <div className="summary-row"><span>Items ({selectedPaidItems.length})</span><span>{formatPHP(checkoutTotals.subtotal)}</span></div>
+            {checkoutTotals.savings > 0 && <div className="summary-row promo-savings"><span>Promo Savings</span><span>-{formatPHP(checkoutTotals.savings)}</span></div>}
+            <div className="summary-row"><span>Shipping</span><span>{checkoutTotals.shippingFee === 0 ? 'Free' : formatPHP(checkoutTotals.shippingFee)}</span></div>
             <hr />
-            <div className="summary-row total"><span>Total</span><span>{formatPHP(total)}</span></div>
+            <div className="summary-row total"><span>Total</span><span>{formatPHP(checkoutTotals.total)}</span></div>
           </div>
         </div>
       </div>

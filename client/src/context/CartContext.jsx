@@ -7,11 +7,11 @@ const CartContext = createContext();
 export function CartProvider({ children }) {
   const { isLoggedIn } = useAuth();
   const [items, setItems] = useState([]);
-  const [totals, setTotals] = useState({ itemCount: 0, subtotal: 0, shippingFee: 0, tax: 0, total: 0, savings: 0 });
+  const [totals, setTotals] = useState({ itemCount: 0, subtotal: 0, discountedSubtotal: 0, shippingFee: 0, tax: 0, total: 0, savings: 0 });
   const [loading, setLoading] = useState(false);
 
   const fetchCart = useCallback(async () => {
-    if (!isLoggedIn) { setItems([]); setTotals({ itemCount: 0, subtotal: 0, shippingFee: 0, tax: 0, total: 0, savings: 0 }); return; }
+    if (!isLoggedIn) { setItems([]); setTotals({ itemCount: 0, subtotal: 0, discountedSubtotal: 0, shippingFee: 0, tax: 0, total: 0, savings: 0 }); return; }
     try {
       setLoading(true);
       const { data } = await cartAPI.get();
@@ -19,6 +19,7 @@ export function CartProvider({ children }) {
       setTotals({
         itemCount: data.itemCount || 0,
         subtotal: Number(data.subtotal || 0),
+        discountedSubtotal: Number(data.discountedSubtotal || 0),
         shippingFee: Number(data.shippingFee || 0),
         tax: Number(data.tax || 0),
         total: Number(data.total || 0),
@@ -26,7 +27,7 @@ export function CartProvider({ children }) {
       });
     } catch {
       setItems([]);
-      setTotals({ itemCount: 0, subtotal: 0, shippingFee: 0, tax: 0, total: 0, savings: 0 });
+      setTotals({ itemCount: 0, subtotal: 0, discountedSubtotal: 0, shippingFee: 0, tax: 0, total: 0, savings: 0 });
     }
     finally { setLoading(false); }
   }, [isLoggedIn]);
@@ -51,18 +52,19 @@ export function CartProvider({ children }) {
 
   const clearCart = () => {
     setItems([]);
-    setTotals({ itemCount: 0, subtotal: 0, shippingFee: 0, tax: 0, total: 0, savings: 0 });
+    setTotals({ itemCount: 0, subtotal: 0, discountedSubtotal: 0, shippingFee: 0, tax: 0, total: 0, savings: 0 });
   };
 
   const itemCount = totals.itemCount;
   const subtotal = totals.subtotal;
+  const discountedSubtotal = totals.discountedSubtotal;
   const shippingFee = totals.shippingFee;
   const tax = totals.tax;
   const total = totals.total;
   const savings = totals.savings;
 
   return (
-    <CartContext.Provider value={{ items, loading, addItem, updateQty, removeItem, clearCart, fetchCart, itemCount, subtotal, shippingFee, tax, total, savings }}>
+    <CartContext.Provider value={{ items, loading, addItem, updateQty, removeItem, clearCart, fetchCart, itemCount, subtotal, discountedSubtotal, shippingFee, tax, total, savings }}>
       {children}
     </CartContext.Provider>
   );

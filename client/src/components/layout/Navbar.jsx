@@ -16,7 +16,6 @@ export default function Navbar() {
 
   const announcements = [
     <><Truck size={14} /> <span><strong>Free Shipping</strong> on all orders over ₱2,000</span></>,
-    <><span><strong>SALE ALERT:</strong> Up to 30% off selected Premium Tiles!</span></>,
     <><span>New arrivals are here. <strong>Explore the 2026 Collection</strong></span></>
   ];
 

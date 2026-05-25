@@ -15,10 +15,14 @@ router.post('/place', async (req, res) => {
     await ensurePromotionSchema(conn);
     await conn.beginTransaction();
 
-    const { municipality, city, barangay, street, postalCode, paymentRef } = req.body;
+    const { municipality, barangay, street, postalCode, paymentRef } = req.body;
+    const requestedProductIds = Array.isArray(req.body.productIds)
+      ? req.body.productIds.map(Number).filter((id) => Number.isInteger(id) && id > 0)
+      : [];
+    const city = municipality;
 
     // FR-30: Validate address
-    if (!municipality || !city || !barangay || !street || !postalCode) {
+    if (!municipality || !barangay || !street || !postalCode) {
       await conn.rollback();
       return res.status(400).json({ error: 'All address fields are required.' });
     }
@@ -30,7 +34,7 @@ router.post('/place', async (req, res) => {
       return res.status(400).json({ error: 'Cart not found.' });
     }
 
-    const [cartItems] = await conn.execute(
+    const [allCartItems] = await conn.execute(
       `SELECT ci.product_id, ci.quantity, p.name, p.price, p.category, i.stock_qty
               , ${promotionSelect}
        FROM cart_items ci
@@ -40,10 +44,13 @@ router.post('/place', async (req, res) => {
        WHERE ci.cart_id = ?`,
       [carts[0].id]
     );
+    const cartItems = requestedProductIds.length
+      ? allCartItems.filter((item) => requestedProductIds.includes(Number(item.product_id)))
+      : allCartItems;
 
     if (cartItems.length === 0) {
       await conn.rollback();
-      return res.status(400).json({ error: 'Cart is empty.' });
+      return res.status(400).json({ error: requestedProductIds.length ? 'Select at least one available cart item.' : 'Cart is empty.' });
     }
 
     // FR-67: Verify stock for all items
@@ -111,8 +118,16 @@ router.post('/place', async (req, res) => {
       [orderId, 'GCash', gcashRef, total, 'Pending']
     );
 
-    // FR-36: Clear cart
-    await conn.execute('DELETE FROM cart_items WHERE cart_id = ?', [carts[0].id]);
+    // FR-36: Clear checked out cart items
+    if (requestedProductIds.length) {
+      const placeholders = requestedProductIds.map(() => '?').join(',');
+      await conn.execute(
+        `DELETE FROM cart_items WHERE cart_id = ? AND product_id IN (${placeholders})`,
+        [carts[0].id, ...requestedProductIds]
+      );
+    } else {
+      await conn.execute('DELETE FROM cart_items WHERE cart_id = ?', [carts[0].id]);
+    }
 
     await conn.commit();
 

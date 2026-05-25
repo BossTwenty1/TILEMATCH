@@ -7,7 +7,8 @@ const { authenticate, generateToken } = require('../middleware/auth');
 // FR-01: Register with email, password, full name, address
 router.post('/register', async (req, res) => {
   try {
-    const { email, password, firstName, lastName, phone, municipality, city, barangay, street, postalCode } = req.body;
+    const { email, password, firstName, lastName, phone, municipality, barangay, street, postalCode } = req.body;
+    const city = municipality;
 
     // FR-02: Validate email format
     if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
@@ -137,7 +138,8 @@ router.get('/profile', authenticate, async (req, res) => {
 // FR-07: Update profile
 router.put('/profile', authenticate, async (req, res) => {
   try {
-    const { firstName, lastName, phone, municipality, city, barangay, street, postalCode } = req.body;
+    const { firstName, lastName, phone, municipality, barangay, street, postalCode } = req.body;
+    const city = municipality;
     await db.execute(
       `UPDATE customers SET first_name=?, last_name=?, phone=?, municipality=?, city=?, barangay=?, street=?, postal_code=? WHERE id=?`,
       [firstName, lastName, phone, municipality, city, barangay, street, postalCode, req.user.id]
