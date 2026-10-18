@@ -299,7 +299,10 @@ router.put('/orders/:id/status', async (req, res) => {
     }
 
     // FR-71: Send status update email
-    const [orders] = await db.execute('SELECT * FROM orders WHERE id = ?', [req.params.id]);
+    const [orders] = await db.execute(
+      'SELECT o.*, p.payment_ref FROM orders o LEFT JOIN payments p ON o.id = p.order_id WHERE o.id = ?',
+      [req.params.id]
+    );
     if (orders.length > 0) {
       sendStatusUpdate(orders[0], status).catch(err => console.error('Email error:', err));
     }

@@ -8,9 +8,9 @@ export default function Confirmation() {
     <div className="page">
       <div className="container" style={{ textAlign: 'center', paddingTop: 60 }}>
         <CheckCircle size={64} style={{ color: 'var(--success)', marginBottom: 20 }} />
-        <h1>Order Placed Successfully!</h1>
+        <h1>Demo Order Placed Successfully!</h1>
         <p style={{ color: 'var(--text-secondary)', fontSize: 16, margin: '12px 0 32px' }}>
-          Your order <strong>{orderNumber}</strong> has been confirmed. You will receive a confirmation email shortly.
+          Your demo order <strong>{orderNumber}</strong> has been recorded for this academic demonstration. No payment was collected and no real delivery will occur.
         </p>
         <div style={{ display: 'flex', gap: 16, justifyContent: 'center', flexWrap: 'wrap' }}>
           <Link to={`/tracking?order=${orderNumber}`} className="btn btn-primary btn-lg">

@@ -21,11 +21,10 @@ test.describe('🛒 TileMatch E-Commerce Customer E2E Flow', () => {
     await page.fill('input[name="registerEmail"]', uniqueEmail);
     await page.fill('input[name="registerPassword"]', securePassword);
     await page.fill('input[name="phone"]', '09171234567');
-    await page.fill('input[name="municipality"]', 'Pasig');
-    await page.fill('input[name="city"]', 'Metro Manila');
-    await page.fill('input[name="barangay"]', 'San Antonio');
+    await page.selectOption('select[name="municipality"]', { label: 'Daraga' });
+    await page.selectOption('select[name="barangay"]', { label: 'Budiao' });
     await page.fill('input[name="street"]', '101 Emerald Plaza');
-    await page.fill('input[name="postalCode"]', '1600');
+    await expect(page.locator('input[name="postalCode"]')).toHaveValue('4501');
     
     // Click submit registration
     await page.click('.auth-card form button[type="submit"]');
@@ -73,19 +72,23 @@ test.describe('🛒 TileMatch E-Commerce Customer E2E Flow', () => {
     await expect(page.locator('.step.active:has-text("Shipping")')).toBeVisible();
 
     // The fields should be pre-filled from registration. Confirm and continue to payment
+    await expect(page.locator('select[name="municipality"]')).toHaveValue('Daraga');
+    await expect(page.locator('select[name="barangay"]')).toHaveValue('Budiao');
+    await expect(page.locator('input[name="postalCode"]')).toHaveValue('4501');
     await page.click('button:has-text("Continue to Payment")');
 
     // Checkout Process (Step 2: GCash Payment)
     await expect(page.locator('.step.active:has-text("Payment")')).toBeVisible();
     
-    // Enter GCash 13-digit reference number mockup
-    await page.fill('input[placeholder="Enter the 13-digit reference number"]', '1234567890123');
+    await expect(page.getByText('Simulated academic checkout')).toBeVisible();
+    await expect(page.locator('.gcash-section input')).toHaveCount(0);
+    await expect(page.locator('.gcash-section img')).toHaveCount(0);
 
     // Confirm order
-    await page.click('button:has-text("Confirm Order")');
+    await page.click('button:has-text("Confirm Demo Order")');
 
     // 6. Confirmation screen
-    await page.waitForSelector('h1:has-text("Order Placed Successfully!")');
+    await page.waitForSelector('h1:has-text("Demo Order Placed Successfully!")');
     await expect(page.locator('h1')).toContainText(/placed/i);
     
     const orderNumber = await page.locator('.container p strong').textContent();

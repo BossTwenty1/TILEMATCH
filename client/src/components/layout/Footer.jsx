@@ -38,7 +38,7 @@ export default function Footer() {
           <div className="footer-payments">
             <h4>Payment Methods</h4>
             <div className="payment-pills">
-              <span className="payment-pill gcash">GCash</span>
+              <span className="payment-pill gcash">GCash Demo</span>
             </div>
             <p className="secure-badge" style={{marginTop: 12, display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, color: 'var(--success)'}}>
               <ShieldCheck size={16} /> Secure Checkout

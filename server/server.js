@@ -1,6 +1,8 @@
 const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
+// Reject unsafe authentication configuration before connecting to the database.
+require('./middleware/auth');
 
 // Import database (will test connection on require)
 require('./config/db');

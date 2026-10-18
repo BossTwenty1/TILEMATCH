@@ -1,7 +1,10 @@
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
 
-const JWT_SECRET = process.env.JWT_SECRET || 'tilematch_secret_key';
+const JWT_SECRET = process.env.JWT_SECRET;
+if (!/^[a-f0-9]{64}$/i.test(JWT_SECRET || '') || new Set(JWT_SECRET.toLowerCase()).size < 8) {
+  throw new Error('JWT_SECRET must be 32 random bytes encoded as 64 hexadecimal characters.');
+}
 
 // Verify JWT token - protects routes requiring authentication
 const authenticate = (req, res, next) => {

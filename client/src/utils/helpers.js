@@ -1,9 +1,6 @@
 export const formatPHP = (amount) =>
   new Intl.NumberFormat('en-PH', { style: 'currency', currency: 'PHP' }).format(amount);
 
-export const generateGCashRef = () =>
-  Array.from({ length: 13 }, () => Math.floor(Math.random() * 10)).join('');
-
 export const isValidEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
 export const getStockBadge = (stockQty, threshold = 10) => {

@@ -26,7 +26,6 @@ export default function Checkout() {
   const navigate = useNavigate();
   const [step, setStep] = useState(1);
   const [submitting, setSubmitting] = useState(false);
-  const [gcashRef, setGcashRef] = useState('');
   const [shipping, setShipping] = useState({
     firstName: user?.firstName || '', lastName: user?.lastName || '',
     email: user?.email || '', phone: user?.phone || '',
@@ -74,9 +73,6 @@ export default function Checkout() {
   };
 
   const handlePlaceOrder = async () => {
-    if (!gcashRef.trim()) {
-      return addToast('Please enter your GCash Reference Number', 'error');
-    }
     setSubmitting(true);
     try {
       const { data } = await ordersAPI.place({
@@ -84,14 +80,13 @@ export default function Checkout() {
         city: shipping.municipality,
         barangay: shipping.barangay, street: shipping.street,
         postalCode: shipping.postalCode,
-        paymentRef: gcashRef,
         productIds: selectedPaidItems.map((item) => item.product_id)
       });
       setOrderCompleted(true);
       sessionStorage.removeItem('tilematch_checkout_items');
       if (selectedPaidItems.length === items.filter((item) => !item.is_freebie).length) clearCart();
       else await fetchCart();
-      addToast('Order placed successfully!');
+      addToast('Demo order placed. No payment was collected.');
       navigate(`/confirmation/${data.order.orderNumber}`);
     } catch (err) {
       addToast(err.response?.data?.error || 'Error placing order', 'error');
@@ -104,6 +99,7 @@ export default function Checkout() {
     <div className="checkout-page page">
       <div className="container">
         <h1>Checkout</h1>
+        <p className="gcash-instruction" role="note">Academic demonstration only. No real payments or deliveries. Do not send money.</p>
         <div className="checkout-steps">
           <div className={`step ${step >= 1 ? 'active' : ''}`}><span>1</span> Shipping</div>
           <div className="step-line" />
@@ -131,37 +127,24 @@ export default function Checkout() {
 
             {step === 2 && (
               <div className="card card-body">
-                <h3>GCash Payment</h3>
+                <h3>GCash Payment Simulation</h3>
                 <div className="gcash-section">
                   <div className="gcash-info">
                     <Smartphone size={32} className="gcash-icon" />
                     <div>
-                      <h4>Pay via GCash</h4>
-                      <p>Send the exact amount to the number below or scan the QR Code:</p>
+                      <h4>Simulated academic checkout</h4>
+                      <p>No money is collected. Do not send money or enter a real GCash reference.</p>
                     </div>
                   </div>
                   <div className="gcash-details" style={{ display: 'flex', gap: '24px', alignItems: 'flex-start', flexWrap: 'wrap' }}>
                     <div style={{ flex: 1, minWidth: '250px' }}>
-                      <div className="gcash-row"><span>GCash Number:</span><strong>0917-TILE-MATCH</strong></div>
-                      <div className="gcash-row"><span>Amount to Pay:</span><strong className="gcash-amount">{formatPHP(checkoutTotals.total)}</strong></div>
+                      <div className="gcash-row"><span>Demo total:</span><strong className="gcash-amount">{formatPHP(checkoutTotals.total)}</strong></div>
                       <div className="gcash-row" style={{ flexDirection: 'column', alignItems: 'flex-start', marginTop: 12 }}>
-                        <span style={{ marginBottom: 8, fontWeight: 500 }}>Reference No *</span>
-                        <input 
-                          className="input" 
-                          placeholder="Enter the 13-digit reference number" 
-                          value={gcashRef} 
-                          onChange={e => setGcashRef(e.target.value)} 
-                          required 
-                          style={{ width: '100%', maxWidth: 300 }}
-                        />
+                        <span>A DEMO reference will be generated automatically.</span>
                       </div>
                     </div>
-                    <div style={{ flex: '0 0 auto', textAlign: 'center', backgroundColor: '#fff', padding: '12px', borderRadius: '12px', border: '1px solid #eee' }}>
-                      <img src="/gcash-qr.png" alt="GCash QR Code" style={{ width: '160px', height: '160px', display: 'block', margin: '0 auto' }} />
-                      <div style={{ fontSize: '12px', marginTop: '8px', fontWeight: 500, color: '#0052cc' }}>Scan to Pay</div>
-                    </div>
                   </div>
-                  <p className="gcash-instruction">After sending payment via GCash, click "Confirm Order" below.</p>
+                  <p className="gcash-instruction">Click "Confirm Demo Order" to complete the simulation without payment.</p>
                 </div>
 
                 <h4 style={{marginTop:24}}>Order Summary</h4>
@@ -175,7 +158,7 @@ export default function Checkout() {
                 <div className="form-actions">
                   <button className="btn btn-ghost" onClick={() => setStep(1)}><ArrowLeft size={16} /> Back</button>
                   <button className="btn btn-accent btn-lg" onClick={handlePlaceOrder} disabled={submitting}>
-                    {submitting ? 'Placing Order...' : <><CheckCircle size={18} /> Confirm Order</>}
+                    {submitting ? 'Placing Demo Order...' : <><CheckCircle size={18} /> Confirm Demo Order</>}
                   </button>
                 </div>
               </div>

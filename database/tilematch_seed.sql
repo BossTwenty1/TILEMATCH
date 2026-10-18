@@ -17,8 +17,7 @@ INSERT INTO suppliers (id, name, contact_name, email, phone, address) VALUES
 
 -- ============================================================
 -- CUSTOMERS (5 customers + 1 admin = 6 users)
--- Passwords are bcrypt hashes of the plaintext shown in comments
--- For development, use plaintext; hash in production via backend
+-- Sample customer passwords are placeholders. The sample admin cannot log in.
 -- ============================================================
 INSERT INTO customers (id, email, password, first_name, last_name, phone, role, municipality, city, barangay, street, postal_code, is_verified, created_at) VALUES
 -- password: password123
@@ -31,8 +30,8 @@ INSERT INTO customers (id, email, password, first_name, last_name, phone, role, 
 (4, 'ana@email.com',        '$2b$10$placeholder_hash_ana',        'Ana',     'Garcia',      '09171234568', 'customer', 'Sorsogon',   'Sorsogon City',   'Burabod',       '12 Luna Street',          '4700', TRUE,  '2025-04-20 09:00:00'),
 -- password: password123
 (5, 'carlos@email.com',     '$2b$10$placeholder_hash_carlos',     'Carlos',  'Mendoza',     '09281234568', 'customer', 'Tabaco',     'Tabaco City',     'Quinale',       '99 Penaranda St',         '4511', TRUE,  '2025-05-15 11:00:00'),
--- password: admin123
-(6, 'admin@tilematch.com',  '$2b$10$placeholder_hash_admin',      'Admin',   'TileMatch',   '09170000000', 'admin',    NULL,         NULL,              NULL,            NULL,                      NULL,   TRUE,  '2025-01-01 00:00:00');
+-- Sample admin is locked; provision a private password through an approved process.
+(6, 'admin@tilematch.com',  '!',      'Admin',   'TileMatch',   '09170000000', 'admin',    NULL,         NULL,              NULL,            NULL,                      NULL,   TRUE,  '2025-01-01 00:00:00');
 
 -- ============================================================
 -- PRODUCTS (30 products, 6 per category)

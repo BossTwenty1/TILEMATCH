@@ -27,7 +27,7 @@ jobs:
       - name: 🟢 Setup Node.js Environment
         uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: 22
           cache: 'npm'
           cache-dependency-path: './server/package-lock.json'
 
@@ -46,6 +46,9 @@ jobs:
           cd testing
           npm install
 
+      - name: ⚙️ Install Frontend Dependencies
+        run: npm ci --prefix client
+
       - name: 🌐 Install Playwright Chromium Browser
         run: |
           cd testing
@@ -54,13 +57,22 @@ jobs:
       - name: 🚀 Start Server & Execute Automated Tests Suite
         run: |
           cd server
+          export JWT_SECRET=$(openssl rand -hex 32)
+          npm test
           npm start &
           # Wait for API server to be responsive
           npx wait-on http://localhost:5000/api/health --timeout 20000
+
+          cd ../client
+          npm run build
+          VITE_API_BASE_URL=http://localhost:5000/api npm run dev -- --host 127.0.0.1 &
+          npx wait-on http://127.0.0.1:5173 --timeout 20000
           
           cd ../testing
           # Execute Jest API integration tests and Playwright E2E browser tests
-          npm run test
+          # Supertest imports the app, so its listener must use an ephemeral port.
+          PORT=0 npm run test:api
+          npm run test:e2e
         env:
           PORT: 5000
           DB_HOST: 127.0.0.1
@@ -68,4 +80,3 @@ jobs:
           DB_USER: root
           DB_PASSWORD: ''
           DB_NAME: tilematch_db
-          JWT_SECRET: pipeline_super_secret_testing_key

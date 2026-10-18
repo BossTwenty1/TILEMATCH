@@ -111,7 +111,7 @@ describe('🛒 Cart CRUD & Recalculation API Endpoints', () => {
       expect(res.body).toHaveProperty('error');
     });
 
-    it('should successfully update item quantities and correctly recalculate subtotal, 12% VAT, and shipping exemptions', async () => {
+    it('should update item quantities and recalculate subtotal, zero tax, shipping, and total', async () => {
       if (!activeProduct) return;
 
       const newQty = 3;
@@ -133,8 +133,8 @@ describe('🛒 Cart CRUD & Recalculation API Endpoints', () => {
 
       const subtotal = Number(activeProduct.price) * newQty;
       const shippingFee = subtotal >= 2000 ? 0 : 200;
-      const expectedTax = Math.round(subtotal * 0.12 * 100) / 100;
-      const expectedTotal = Math.round((subtotal + shippingFee + expectedTax) * 100) / 100;
+      const expectedTax = 0;
+      const expectedTotal = Math.round((subtotal + shippingFee) * 100) / 100;
 
       expect(cartRes.body.items[0].quantity).toBe(newQty);
       expect(Number(cartRes.body.subtotal)).toBe(subtotal);
