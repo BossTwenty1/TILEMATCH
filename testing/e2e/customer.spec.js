@@ -21,11 +21,10 @@ test.describe('🛒 TileMatch E-Commerce Customer E2E Flow', () => {
     await page.fill('input[name="registerEmail"]', uniqueEmail);
     await page.fill('input[name="registerPassword"]', securePassword);
     await page.fill('input[name="phone"]', '09171234567');
-    await page.fill('input[name="municipality"]', 'Pasig');
-    await page.fill('input[name="city"]', 'Metro Manila');
-    await page.fill('input[name="barangay"]', 'San Antonio');
+    await page.selectOption('select[name="municipality"]', { label: 'Daraga' });
+    await page.selectOption('select[name="barangay"]', { label: 'Budiao' });
     await page.fill('input[name="street"]', '101 Emerald Plaza');
-    await page.fill('input[name="postalCode"]', '1600');
+    await expect(page.locator('input[name="postalCode"]')).toHaveValue('4501');
     
     // Click submit registration
     await page.click('.auth-card form button[type="submit"]');
@@ -73,6 +72,9 @@ test.describe('🛒 TileMatch E-Commerce Customer E2E Flow', () => {
     await expect(page.locator('.step.active:has-text("Shipping")')).toBeVisible();
 
     // The fields should be pre-filled from registration. Confirm and continue to payment
+    await expect(page.locator('select[name="municipality"]')).toHaveValue('Daraga');
+    await expect(page.locator('select[name="barangay"]')).toHaveValue('Budiao');
+    await expect(page.locator('input[name="postalCode"]')).toHaveValue('4501');
     await page.click('button:has-text("Continue to Payment")');
 
     // Checkout Process (Step 2: GCash Payment)
