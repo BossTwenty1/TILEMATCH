@@ -145,7 +145,7 @@ CREATE TABLE cart_items (
 -- ============================================================
 CREATE TABLE orders (
   id                  INT AUTO_INCREMENT PRIMARY KEY,
-  order_number        VARCHAR(20) NOT NULL UNIQUE,   -- e.g. ORD-2025-0001
+  order_number        VARCHAR(40) NOT NULL UNIQUE,   -- ORD- followed by a UUID
   customer_id         INT NOT NULL,
   customer_name       VARCHAR(200) NOT NULL,
   customer_email      VARCHAR(255) NOT NULL,
@@ -191,7 +191,7 @@ CREATE TABLE payments (
   id              INT AUTO_INCREMENT PRIMARY KEY,
   order_id        INT NOT NULL UNIQUE,
   payment_method  ENUM('GCash') NOT NULL DEFAULT 'GCash',
-  payment_ref     VARCHAR(20) NOT NULL,          -- 13-digit GCash reference
+  payment_ref     VARCHAR(20) NOT NULL,          -- DEMO- reference for simulated checkout
   amount          DECIMAL(10,2) NOT NULL,
   status          ENUM('Pending', 'Confirmed') NOT NULL DEFAULT 'Pending',
   paid_at         TIMESTAMP NULL,

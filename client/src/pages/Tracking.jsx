@@ -25,7 +25,12 @@ export default function Tracking() {
     try {
       const { data } = await ordersAPI.track(query.trim());
       setOrder(data);
-    } catch { setError('Order not found. Please check the order number.'); setOrder(null); }
+    } catch (err) {
+      setError(err.response?.status === 401
+        ? 'Please sign in to the account that placed this order.'
+        : 'Order not found in your account. Please check the order number.');
+      setOrder(null);
+    }
     finally { setLoading(false); }
   };
 
@@ -41,7 +46,7 @@ export default function Tracking() {
 
         <div className="tracking-search card card-body">
           <div className="tracking-input">
-            <input className="input" placeholder="Enter Order Number (e.g. ORD-2025-0001)" value={orderNumber}
+            <input className="input" placeholder="Enter your order number" value={orderNumber}
               onChange={e => setOrderNumber(e.target.value)} onKeyDown={e => e.key === 'Enter' && handleSearch()} />
             <button className="btn btn-primary" onClick={() => handleSearch()} disabled={loading}>
               <Search size={18} /> {loading ? 'Searching...' : 'Track'}
@@ -94,8 +99,9 @@ export default function Tracking() {
                 <p>{order.ship_street}, {order.ship_barangay}<br/>{order.ship_municipality} {order.ship_postal_code}</p>
               </div>
               <div className="tracking-section">
-                <h4>Payment</h4>
-                <p>GCash Ref: <strong>{order.payment_ref}</strong></p>
+                <h4>{order.payment_ref?.startsWith('DEMO-') ? 'Simulated Payment' : 'Payment'}</h4>
+                {order.payment_ref?.startsWith('DEMO-') && <p>Academic demonstration. No payment collected or real delivery.</p>}
+                <p>Reference: <strong>{order.payment_ref}</strong></p>
                 <p>Total: <strong>{formatPHP(order.total)}</strong></p>
                 {order.estimated_delivery && <p>Est. Delivery: <strong>{new Date(order.estimated_delivery).toLocaleDateString()}</strong></p>}
               </div>

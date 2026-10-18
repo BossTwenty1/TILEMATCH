@@ -4,6 +4,7 @@
   "description": "TileMatch E-Commerce API Server",
   "main": "server.js",
   "scripts": {
+    "test": "node --test test/*.test.js",
     "start": "node server.js",
     "dev": "node --watch server.js",
     "db:export": "node scripts/export_products.js",

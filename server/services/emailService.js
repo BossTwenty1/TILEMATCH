@@ -28,8 +28,11 @@ const logEmail = async (recipient, subject, body, status) => {
 // Send order confirmation email (FR-48, FR-49)
 const sendOrderConfirmation = async (order) => {
   const itemsList = order.items.map(i => `• ${i.product_name} x${i.quantity} — PHP ${i.line_total.toFixed(2)}`).join('\n');
-  const subject = `Order Confirmed — ${order.order_number}`;
-  const body = `Hi ${order.customer_name},\n\nYour order has been placed successfully!\n\nOrder #: ${order.order_number}\nPayment Ref: ${order.payment_ref}\n\nItems:\n${itemsList}\n\nSubtotal: PHP ${order.subtotal.toFixed(2)}\nShipping: PHP ${order.shipping_fee.toFixed(2)}\nTotal: PHP ${order.total.toFixed(2)}\n\nEstimated Delivery: ${order.estimated_delivery}\n\nThank you for shopping at TileMatch!`;
+  const demoNotice = order.payment_ref?.startsWith('DEMO-')
+    ? 'Academic demonstration only. No payment was collected and no real delivery will occur. Do not send money.\n\n'
+    : '';
+  const subject = `${demoNotice ? 'Demo ' : ''}Order Confirmed — ${order.order_number}`;
+  const body = `${demoNotice}Hi ${order.customer_name},\n\nYour order has been placed successfully!\n\nOrder #: ${order.order_number}\nPayment Ref: ${order.payment_ref}\n\nItems:\n${itemsList}\n\nSubtotal: PHP ${order.subtotal.toFixed(2)}\nShipping: PHP ${order.shipping_fee.toFixed(2)}\nTotal: PHP ${order.total.toFixed(2)}\n\nEstimated Delivery: ${order.estimated_delivery}\n\nThank you for shopping at TileMatch!`;
 
   try {
     await transporter.sendMail({
@@ -56,7 +59,10 @@ const sendStatusUpdate = async (order, newStatus) => {
   };
 
   const subject = `Order ${newStatus} — ${order.order_number}`;
-  const body = `Hi ${order.customer_name},\n\n${statusMessages[newStatus] || `Your order status has been updated to: ${newStatus}`}\n\nOrder #: ${order.order_number}\nTotal: PHP ${order.total.toFixed(2)}\n\n— TileMatch Team`;
+  const demoNotice = order.payment_ref?.startsWith('DEMO-')
+    ? 'Academic demonstration only. No payment was collected and no real delivery will occur. Do not send money.\n\n'
+    : '';
+  const body = `${demoNotice}Hi ${order.customer_name},\n\n${statusMessages[newStatus] || `Your order status has been updated to: ${newStatus}`}\n\nOrder #: ${order.order_number}\nTotal: PHP ${order.total.toFixed(2)}\n\n— TileMatch Team`;
 
   try {
     await transporter.sendMail({

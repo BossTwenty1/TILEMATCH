@@ -78,14 +78,15 @@ test.describe('🛒 TileMatch E-Commerce Customer E2E Flow', () => {
     // Checkout Process (Step 2: GCash Payment)
     await expect(page.locator('.step.active:has-text("Payment")')).toBeVisible();
     
-    // Enter GCash 13-digit reference number mockup
-    await page.fill('input[placeholder="Enter the 13-digit reference number"]', '1234567890123');
+    await expect(page.getByText('Simulated academic checkout')).toBeVisible();
+    await expect(page.locator('.gcash-section input')).toHaveCount(0);
+    await expect(page.locator('.gcash-section img')).toHaveCount(0);
 
     // Confirm order
-    await page.click('button:has-text("Confirm Order")');
+    await page.click('button:has-text("Confirm Demo Order")');
 
     // 6. Confirmation screen
-    await page.waitForSelector('h1:has-text("Order Placed Successfully!")');
+    await page.waitForSelector('h1:has-text("Demo Order Placed Successfully!")');
     await expect(page.locator('h1')).toContainText(/placed/i);
     
     const orderNumber = await page.locator('.container p strong').textContent();

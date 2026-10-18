@@ -1,4 +1,5 @@
 const express = require('express');
+const { randomUUID, randomBytes } = require('node:crypto');
 const router = express.Router();
 const db = require('../config/db');
 const { authenticate } = require('../middleware/auth');
@@ -15,7 +16,7 @@ router.post('/place', async (req, res) => {
     await ensurePromotionSchema(conn);
     await conn.beginTransaction();
 
-    const { municipality, barangay, street, postalCode, paymentRef } = req.body;
+    const { municipality, barangay, street, postalCode } = req.body;
     const requestedProductIds = Array.isArray(req.body.productIds)
       ? req.body.productIds.map(Number).filter((id) => Number.isInteger(id) && id > 0)
       : [];
@@ -67,7 +68,7 @@ router.post('/place', async (req, res) => {
     const { subtotal, tax, shippingFee, total } = pricing;
 
     // FR-33: Generate unique order number
-    const orderNumber = `ORD-2025-${String(Date.now()).slice(-4).padStart(4, '0')}`;
+    const orderNumber = `ORD-${randomUUID()}`;
 
     // Get customer info
     const [users] = await conn.execute('SELECT first_name, last_name, email FROM customers WHERE id = ?', [req.user.id]);
@@ -111,8 +112,8 @@ router.post('/place', async (req, res) => {
       );
     }
 
-    // FR-37 through FR-42: Record GCash payment
-    const gcashRef = paymentRef || Array.from({ length: 13 }, () => Math.floor(Math.random() * 10)).join('');
+    // Academic simulation only: never accept a real payment reference from checkout.
+    const gcashRef = `DEMO-${randomBytes(7).toString('hex')}`;
     await conn.execute(
       'INSERT INTO payments (order_id, payment_method, payment_ref, amount, status) VALUES (?, ?, ?, ?, ?)',
       [orderId, 'GCash', gcashRef, total, 'Pending']
@@ -140,7 +141,8 @@ router.post('/place', async (req, res) => {
     sendOrderConfirmation(orderData).catch(err => console.error('Email error:', err));
 
     res.status(201).json({
-      message: 'Order placed successfully!',
+      message: 'Demo order placed. No payment was collected.',
+      paymentMode: 'simulation',
       order: {
         id: orderId,
         orderNumber,
@@ -182,8 +184,8 @@ router.get('/track/:orderNumber', async (req, res) => {
     const [orders] = await db.execute(
       `SELECT o.*, p.payment_ref, p.status as payment_status
        FROM orders o LEFT JOIN payments p ON o.id = p.order_id
-       WHERE o.order_number = ?`,
-      [req.params.orderNumber]
+       WHERE o.order_number = ? AND o.customer_id = ?`,
+      [req.params.orderNumber, req.user.id]
     );
     if (orders.length === 0) return res.status(404).json({ error: 'Order not found.' });
 
